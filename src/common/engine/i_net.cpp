@@ -1175,6 +1175,15 @@ int I_InitNetwork (void)
         doomcom.numplayers = doomcom.numnodes = 1; // Will be updated as players join
         doomcom.consoleplayer = isServer ? 0 : 1; // Server is always player 0
 
+        // Initialize network message serialization system
+        if (!InitializeNetworkSerialization())
+        {
+            throw std::runtime_error("Failed to initialize network serialization");
+        }
+
+        // Set up network diagnostics
+        SetupNetworkDiagnostics();
+
         return true;
     }
     catch (const std::exception& e)
