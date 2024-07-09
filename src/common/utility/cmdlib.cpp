@@ -39,6 +39,7 @@
 #include "filesystem.h"
 #include "files.h"
 #include "md5.h"
+#include "i_net.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1068,4 +1069,26 @@ FString GetStringFromLump(int lump, bool zerotruncate)
 	FString ScriptBuffer(fd.string(), fd.size());
 	if (zerotruncate) ScriptBuffer.Truncate(strlen(ScriptBuffer.GetChars()));	// this is necessary to properly truncate the generated string to not contain 0 bytes.
 	return ScriptBuffer;
+}
+
+bool StartNetworkGame(int port)
+{
+    return I_StartNetworkAsServer(port);
+}
+
+bool ConnectToNetworkGame(const char* address, int port)
+{
+    return I_ConnectToServer(address, port);
+}
+
+void RunNetworkGame()
+{
+    if (isServer)
+    {
+        I_RunNetworkServer();
+    }
+    else if (isClient)
+    {
+        I_RunNetworkClient();
+    }
 }
