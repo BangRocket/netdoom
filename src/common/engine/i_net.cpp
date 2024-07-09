@@ -146,7 +146,18 @@ void I_RunNetworkServer()
     // Send updates to clients
     GameState gameState;
     gameState.gametic = gametic;
-    // TODO: Add more game state data
+    gameState.consoleplayer = consoleplayer;
+    for (int i = 0; i < MAXPLAYERS; i++)
+    {
+        if (playeringame[i])
+        {
+            gameState.playerStates[i].x = players[i].mo->X();
+            gameState.playerStates[i].y = players[i].mo->Y();
+            gameState.playerStates[i].z = players[i].mo->Z();
+            gameState.playerStates[i].angle = players[i].mo->Angles.Yaw.Degrees();
+            gameState.playerStates[i].health = players[i].health;
+        }
+    }
     
     SendNetworkMessage(&gameState, sizeof(GameState));
 }
@@ -166,14 +177,30 @@ void I_RunNetworkClient()
     if (receivedData && length >= sizeof(GameState))
     {
         GameState* gameState = (GameState*)receivedData;
-        // TODO: Update local game state with received data
         gametic = gameState->gametic;
+        consoleplayer = gameState->consoleplayer;
+        for (int i = 0; i < MAXPLAYERS; i++)
+        {
+            if (playeringame[i])
+            {
+                players[i].mo->SetXYZ(gameState->playerStates[i].x, gameState->playerStates[i].y, gameState->playerStates[i].z);
+                players[i].mo->Angles.Yaw = gameState->playerStates[i].angle;
+                players[i].health = gameState->playerStates[i].health;
+            }
+        }
     }
 }
 
+struct PlayerState {
+    double x, y, z;
+    double angle;
+    int health;
+};
+
 struct GameState {
     int gametic;
-    // TODO: Add more game state data
+    int consoleplayer;
+    PlayerState playerStates[MAXPLAYERS];
 };
 
 // As per http://support.microsoft.com/kb/q192599/ the standard

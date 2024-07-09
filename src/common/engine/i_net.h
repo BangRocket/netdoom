@@ -40,6 +40,19 @@ bool AddClient(const sockaddr_in* address);
 void RemoveClient(const sockaddr_in* address);
 int GetClientPlayer(const sockaddr_in* address);
 
+// Game state structures
+struct PlayerState {
+    double x, y, z;
+    double angle;
+    int health;
+};
+
+struct GameState {
+    int gametic;
+    int consoleplayer;
+    PlayerState playerStates[MAXPLAYERS];
+};
+
 enum ENetConstants
 {
 	MAXNETNODES = 32,	// Increased max computers in a game
