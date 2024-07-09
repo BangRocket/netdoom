@@ -1342,7 +1342,10 @@ void RunNetworkGame()
             players[consoleplayer].lastSentInput++;
             cmd.consistancy = players[consoleplayer].lastSentInput;
             SerializeAndSendPlayerInput(cmd);
-            
+        
+            // Store the command for later reconciliation
+            StoreCommand(players[consoleplayer].lastSentInput, cmd);
+        
             // Predict player movement
             PredictPlayerMovement(players[consoleplayer], cmd);
             
@@ -1392,6 +1395,23 @@ void PredictPlayerMovement(player_t& player, const ticcmd_t& cmd)
     player.mo->SetXYZ(player.mo->Pos.X + player.mo->Vel.X, player.mo->Pos.Y + player.mo->Vel.Y, player.mo->Pos.Z);
 }
 
+// Add this function to store commands
+void StoreCommand(int inputSequence, const ticcmd_t& cmd)
+{
+    storedCommands[inputSequence] = cmd;
+}
+
+// Implement the GetStoredCommand function
+ticcmd_t GetStoredCommand(int inputSequence)
+{
+    auto it = storedCommands.find(inputSequence);
+    if (it != storedCommands.end())
+    {
+        return it->second;
+    }
+    return ticcmd_t(); // Return an empty command if not found
+}
+
 void ReconcileClientPrediction(player_t& player, const PlayerState& serverState, int lastProcessedInput)
 {
     // Implement reconciliation logic here
@@ -1407,8 +1427,21 @@ void ReconcileClientPrediction(player_t& player, const PlayerState& serverState,
         // Reapply any inputs that haven't been processed by the server yet
         for (int i = lastProcessedInput + 1; i <= player.lastSentInput; i++)
         {
-            ticcmd_t cmd = GetStoredCommand(i); // Implement this function to retrieve stored commands
+            ticcmd_t cmd = GetStoredCommand(i);
             PredictPlayerMovement(player, cmd);
+        }
+    }
+    
+    // Clean up old stored commands
+    for (auto it = storedCommands.begin(); it != storedCommands.end();)
+    {
+        if (it->first <= lastProcessedInput)
+        {
+            it = storedCommands.erase(it);
+        }
+        else
+        {
+            ++it;
         }
     }
 }

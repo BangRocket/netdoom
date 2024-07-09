@@ -31,6 +31,11 @@ void* ReceiveNetworkMessage(size_t* length);
 extern bool isServer;
 extern bool isClient;
 
+// Add these declarations
+void StoreCommand(int inputSequence, const ticcmd_t& cmd);
+ticcmd_t GetStoredCommand(int inputSequence);
+extern std::map<int, ticcmd_t> storedCommands;
+
 // Game state structures
 struct PlayerState {
     double x, y, z;
