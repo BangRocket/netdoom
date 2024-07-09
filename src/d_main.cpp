@@ -1223,6 +1223,9 @@ void D_DoomLoop ()
 			}
 			I_SetFrameTime();
 
+			// Handle network messages
+			RunNetworkGame();
+
 			// process one or more tics
 			if (singletics)
 			{
@@ -1250,6 +1253,20 @@ void D_DoomLoop ()
 			D_ProcessEvents();
 			D_Display ();
 			S_UpdateMusic();
+
+			// Send and receive network messages
+			if (isServer || isClient)
+			{
+				SendNetworkMessage(nullptr, 0); // Replace with actual game state data
+				size_t length;
+				void* receivedData = ReceiveNetworkMessage(&length);
+				if (receivedData && length > 0)
+				{
+					// Process received network data
+					// TODO: Implement network message handling
+				}
+			}
+
 			if (wantToRestart)
 			{
 				wantToRestart = false;
