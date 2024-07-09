@@ -12,11 +12,17 @@ void I_NetInit(const char* msg, int num);
 bool I_NetLoop(bool (*timer_callback)(void*), void* userdata);
 void I_NetDone();
 
+// New functions for client/server support
+bool I_StartNetworkAsServer(int port);
+bool I_ConnectToServer(const char* address, int port);
+void I_RunNetworkServer();
+void I_RunNetworkClient();
+
 enum ENetConstants
 {
-	MAXNETNODES = 8,	// max computers in a game 
+	MAXNETNODES = 32,	// Increased max computers in a game
 	DOOMCOM_ID = 0x12345678,
-	BACKUPTICS = 36,	// number of tics to remember
+	BACKUPTICS = 128,	// Increased number of tics to remember
 	MAXTICDUP = 5,
 	LOCALCMDTICS =(BACKUPTICS*MAXTICDUP),
 	MAX_MSGLEN = 14000,
@@ -87,5 +93,9 @@ struct doomcom_t
 extern doomcom_t doomcom;
 extern bool netgame, multiplayer;
 extern int consoleplayer;
+
+// New variables for client/server support
+extern bool isServer;
+extern bool isClient;
 
 #endif

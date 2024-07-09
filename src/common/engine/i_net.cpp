@@ -79,6 +79,43 @@
 
 #include "i_net.h"
 
+// New variables for client/server support
+bool isServer = false;
+bool isClient = false;
+
+// New functions for client/server support
+bool I_StartNetworkAsServer(int port)
+{
+    // Implementation for starting as a server
+    isServer = true;
+    isClient = false;
+    // TODO: Implement server initialization
+    return true;
+}
+
+bool I_ConnectToServer(const char* address, int port)
+{
+    // Implementation for connecting to a server
+    isServer = false;
+    isClient = true;
+    // TODO: Implement client connection to server
+    return true;
+}
+
+void I_RunNetworkServer()
+{
+    // Implementation for running the server
+    if (!isServer) return;
+    // TODO: Implement server loop
+}
+
+void I_RunNetworkClient()
+{
+    // Implementation for running the client
+    if (!isClient) return;
+    // TODO: Implement client loop
+}
+
 // As per http://support.microsoft.com/kb/q192599/ the standard
 // size for network buffers is 8k.
 #define TRANSMIT_SIZE		8000

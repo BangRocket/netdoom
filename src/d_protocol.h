@@ -50,6 +50,23 @@
 #define NETD_ID		BIGE_ID('N','E','T','D')
 #define WEAP_ID		BIGE_ID('W','E','A','P')
 
+// New protocol messages for client/server communication
+enum ENetworkMessage
+{
+    NET_HELLO,
+    NET_WELCOME,
+    NET_PING,
+    NET_PONG,
+    NET_DISCONNECT,
+    NET_GAMESTATE,
+    NET_PLAYERINFO,
+    NET_MAPCHANGE,
+    NET_TICKUPDATE,
+    NET_FULLUPDATE,
+    NET_RELIABLE,
+    NET_UNRELIABLE,
+};
+
 
 struct zdemoheader_s {
 	uint8_t	demovermajor;
