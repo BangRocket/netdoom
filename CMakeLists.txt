@@ -12,6 +12,30 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+include(FetchContent)
+
+# Declare dependencies
+FetchContent_Declare(
+  zlib
+  GIT_REPOSITORY https://github.com/madler/zlib.git
+  GIT_TAG v1.2.11
+)
+
+FetchContent_Declare(
+  bzip2
+  GIT_REPOSITORY https://gitlab.com/bzip2/bzip2.git
+  GIT_TAG bzip2-1.0.8
+)
+
+FetchContent_Declare(
+  asmjit
+  GIT_REPOSITORY https://github.com/asmjit/asmjit.git
+  GIT_TAG master
+)
+
+# Make dependencies available
+FetchContent_MakeAvailable(zlib bzip2 asmjit)
+
 if (LIBVPX_VCPKG)
 	list(APPEND VCPKG_MANIFEST_FEATURES "vcpkg-libvpx")
 endif()
