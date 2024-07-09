@@ -1254,16 +1254,42 @@ void D_DoomLoop ()
 			D_Display ();
 			S_UpdateMusic();
 
-			// Send and receive network messages
-			if (isServer || isClient)
+			if (netgame)
 			{
-				SendNetworkMessage(nullptr, 0); // Replace with actual game state data
+				// Send and receive network messages
+				GameState gameState;
+				gameState.gametic = gametic;
+				gameState.consoleplayer = consoleplayer;
+				for (int i = 0; i < MAXPLAYERS; i++)
+				{
+					if (playeringame[i])
+					{
+						gameState.playerStates[i].x = players[i].mo->X();
+						gameState.playerStates[i].y = players[i].mo->Y();
+						gameState.playerStates[i].z = players[i].mo->Z();
+						gameState.playerStates[i].angle = players[i].mo->Angles.Yaw.Degrees();
+						gameState.playerStates[i].health = players[i].health;
+					}
+				}
+				SendNetworkMessage(&gameState, sizeof(GameState));
+
 				size_t length;
 				void* receivedData = ReceiveNetworkMessage(&length);
-				if (receivedData && length > 0)
+				if (receivedData && length >= sizeof(GameState))
 				{
-					// Process received network data
-					// TODO: Implement network message handling
+					GameState* receivedState = (GameState*)receivedData;
+					// Update game state based on received data
+					gametic = receivedState->gametic;
+					consoleplayer = receivedState->consoleplayer;
+					for (int i = 0; i < MAXPLAYERS; i++)
+					{
+						if (playeringame[i])
+						{
+							players[i].mo->SetXYZ(receivedState->playerStates[i].x, receivedState->playerStates[i].y, receivedState->playerStates[i].z);
+							players[i].mo->Angles.Yaw = receivedState->playerStates[i].angle;
+							players[i].health = receivedState->playerStates[i].health;
+						}
+					}
 				}
 			}
 
