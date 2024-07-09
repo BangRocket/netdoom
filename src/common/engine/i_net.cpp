@@ -86,34 +86,87 @@ bool isClient = false;
 // New functions for client/server support
 bool I_StartNetworkAsServer(int port)
 {
-    // Implementation for starting as a server
     isServer = true;
     isClient = false;
-    // TODO: Implement server initialization
+    
+    // Initialize server socket
+    mysocket = UDPsocket();
+    if (mysocket == INVALID_SOCKET)
+    {
+        I_Error("I_StartNetworkAsServer: Unable to create socket");
+        return false;
+    }
+    
+    BindToLocalPort(mysocket, port);
+    
+    Printf("Server started on port %d\n", port);
     return true;
 }
 
 bool I_ConnectToServer(const char* address, int port)
 {
-    // Implementation for connecting to a server
     isServer = false;
     isClient = true;
-    // TODO: Implement client connection to server
+    
+    // Initialize client socket
+    mysocket = UDPsocket();
+    if (mysocket == INVALID_SOCKET)
+    {
+        I_Error("I_ConnectToServer: Unable to create socket");
+        return false;
+    }
+    
+    // Connect to server
+    sockaddr_in serverAddress;
+    memset(&serverAddress, 0, sizeof(serverAddress));
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_addr.s_addr = inet_addr(address);
+    serverAddress.sin_port = htons(port);
+    
+    if (connect(mysocket, (sockaddr*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR)
+    {
+        I_Error("I_ConnectToServer: Unable to connect to server");
+        return false;
+    }
+    
+    Printf("Connected to server at %s:%d\n", address, port);
     return true;
 }
 
 void I_RunNetworkServer()
 {
-    // Implementation for running the server
     if (!isServer) return;
-    // TODO: Implement server loop
+    
+    // Simple server loop
+    while (true)
+    {
+        // Handle incoming connections and messages
+        PacketGet();
+        
+        // Process game logic
+        // ...
+        
+        // Send updates to clients
+        PacketSend();
+    }
 }
 
 void I_RunNetworkClient()
 {
-    // Implementation for running the client
     if (!isClient) return;
-    // TODO: Implement client loop
+    
+    // Simple client loop
+    while (true)
+    {
+        // Send player input to server
+        PacketSend();
+        
+        // Receive updates from server
+        PacketGet();
+        
+        // Update game state
+        // ...
+    }
 }
 
 // As per http://support.microsoft.com/kb/q192599/ the standard

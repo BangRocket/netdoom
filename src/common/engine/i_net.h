@@ -17,6 +17,8 @@ bool I_StartNetworkAsServer(int port);
 bool I_ConnectToServer(const char* address, int port);
 void I_RunNetworkServer();
 void I_RunNetworkClient();
+void PacketSend();
+void PacketGet();
 
 enum ENetConstants
 {
