@@ -1092,3 +1092,16 @@ void RunNetworkGame()
         I_RunNetworkClient();
     }
 }
+
+void SendNetworkMessage(const void* data, size_t length)
+{
+    PacketSend();
+}
+
+void* ReceiveNetworkMessage(size_t* length)
+{
+    PacketGet();
+    // Assuming doomcom.data contains the received message
+    *length = doomcom.datalength;
+    return doomcom.data;
+}
