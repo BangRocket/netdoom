@@ -20,6 +20,30 @@ void I_RunNetworkClient();
 void PacketSend();
 void PacketGet();
 
+// New functions for client/server support
+bool StartNetworkGame(int port);
+bool ConnectToNetworkGame(const char* address, int port);
+void RunNetworkGame();
+void SendNetworkMessage(const void* data, size_t length);
+void* ReceiveNetworkMessage(size_t* length);
+
+// New variables for client/server support
+extern bool isServer;
+extern bool isClient;
+
+// Game state structures
+struct PlayerState {
+    double x, y, z;
+    double angle;
+    int health;
+};
+
+struct GameState {
+    int gametic;
+    int consoleplayer;
+    PlayerState playerStates[MAXPLAYERS];
+};
+
 // New functions for network message handling
 void SendNetworkMessage(const void* data, size_t length);
 void* ReceiveNetworkMessage(size_t* length);
