@@ -1172,6 +1172,10 @@ set (PCH_SOURCES
 	common/scripting/backend/vmbuilder.cpp
 	common/scripting/backend/codegen.cpp
 	
+	common/networking/netgame.cpp
+	common/networking/nethost.cpp
+	common/networking/netspectator.cpp
+	
 	utility/nodebuilder/nodebuild.cpp
 	utility/nodebuilder/nodebuild_classify_nosse2.cpp
 	utility/nodebuilder/nodebuild_events.cpp

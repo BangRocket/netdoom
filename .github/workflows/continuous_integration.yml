@@ -106,4 +106,10 @@ jobs:
       shell: bash
       run: |
         cd build
-        ctest -C ${{ matrix.config.build_type }} --output-on-failure
+        ctest -C ${{ matrix.config.build_type }} --output-on-failure --timeout 300
+
+    - name: Run Network Tests
+      shell: bash
+      run: |
+        cd build/network_tests
+        ./run_network_tests.sh

@@ -115,16 +115,16 @@
     - [x] Add network quality indicators (packet loss, jitter) (done in DisplayNetworkStats)
 
 28. Host Migration
-    - [ ] Implement system to handle host disconnection gracefully
+    - [x] Implement system to handle host disconnection gracefully
     - [ ] Add voting system for new host selection
 
 29. Spectator Mode
-    - [ ] Implement spectator mode for multiplayer games
-    - [ ] Add controls for spectators to switch between players
+    - [x] Implement spectator mode for multiplayer games
+    - [x] Add controls for spectators to switch between players
 
 30. Network Game Saving/Loading
-    - [ ] Add ability to save and load multiplayer game states
-    - [ ] Ensure synchronization when loading saved games
+    - [x] Add ability to save and load multiplayer game states
+    - [x] Ensure synchronization when loading saved games
 
 31. Network Debugging Tools
     - [ ] Implement network traffic visualization
