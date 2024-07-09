@@ -1118,62 +1118,70 @@ static bool NodesOnSameNetwork()
 //
 int I_InitNetwork (void)
 {
-	int i;
-	const char *v;
+    try
+    {
+        int i;
+        const char *v;
 
-	memset (&doomcom, 0, sizeof(doomcom));
+        memset (&doomcom, 0, sizeof(doomcom));
 
-	// set up for network
-	v = Args->CheckValue ("-dup");
-	if (v)
-	{
-		doomcom.ticdup = clamp<int> (atoi (v), 1, MAXTICDUP);
-	}
-	else
-	{
-		doomcom.ticdup = 1;
-	}
+        // set up for network
+        v = Args->CheckValue ("-dup");
+        if (v)
+        {
+            doomcom.ticdup = clamp<int> (atoi (v), 1, MAXTICDUP);
+        }
+        else
+        {
+            doomcom.ticdup = 1;
+        }
 
-	v = Args->CheckValue ("-port");
-	if (v)
-	{
-		DOOMPORT = atoi (v);
-		Printf ("using alternate port %i\n", DOOMPORT);
-	}
+        v = Args->CheckValue ("-port");
+        if (v)
+        {
+            DOOMPORT = atoi (v);
+            Printf ("using alternate port %i\n", DOOMPORT);
+        }
 
-	// parse network game options,
-	//		player 1: -host <numplayers>
-	//		player x: -join <player 1's address>
-	if ( (i = Args->CheckParm ("-host")) )
-	{
-		if (!StartNetworkGame(DOOMPORT)) return -1;
-		isServer = true;
-		isClient = false;
-	}
-	else if ( (i = Args->CheckParm ("-join")) )
-	{
-		if (!ConnectToNetworkGame(Args->GetArg(i+1), DOOMPORT)) return -1;
-		isServer = false;
-		isClient = true;
-	}
-	else
-	{
-		// single player game
-		netgame = false;
-		multiplayer = false;
-		doomcom.id = DOOMCOM_ID;
-		doomcom.numplayers = doomcom.numnodes = 1;
-		doomcom.consoleplayer = 0;
-		return false;
-	}
+        // parse network game options,
+        //		player 1: -host <numplayers>
+        //		player x: -join <player 1's address>
+        if ( (i = Args->CheckParm ("-host")) )
+        {
+            if (!StartNetworkGame(DOOMPORT)) throw std::runtime_error("Failed to start network game");
+            isServer = true;
+            isClient = false;
+        }
+        else if ( (i = Args->CheckParm ("-join")) )
+        {
+            if (!ConnectToNetworkGame(Args->GetArg(i+1), DOOMPORT)) throw std::runtime_error("Failed to connect to network game");
+            isServer = false;
+            isClient = true;
+        }
+        else
+        {
+            // single player game
+            netgame = false;
+            multiplayer = false;
+            doomcom.id = DOOMCOM_ID;
+            doomcom.numplayers = doomcom.numnodes = 1;
+            doomcom.consoleplayer = 0;
+            return false;
+        }
 
-	netgame = true;
-	multiplayer = true;
-	doomcom.id = DOOMCOM_ID;
-	doomcom.numplayers = doomcom.numnodes = 1; // Will be updated as players join
-	doomcom.consoleplayer = isServer ? 0 : 1; // Server is always player 0
+        netgame = true;
+        multiplayer = true;
+        doomcom.id = DOOMCOM_ID;
+        doomcom.numplayers = doomcom.numnodes = 1; // Will be updated as players join
+        doomcom.consoleplayer = isServer ? 0 : 1; // Server is always player 0
 
-	return true;
+        return true;
+    }
+    catch (const std::exception& e)
+    {
+        I_FatalError ("Network initialization failed: %s", e.what());
+        return false;
+    }
 }
 
 
