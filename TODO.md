@@ -1,8 +1,9 @@
 # Network Implementation Todo List
 
 1. Implement proper error handling for network operations
-   - Add try-catch blocks around network code
+   - Add try-catch blocks around network code (partially done in I_InitNetwork)
    - Create specific error types for network-related issues
+   - Add error handling to Net_InitNetwork function
 
 2. Improve network message serialization and deserialization
    - Implement a more robust serialization system for game state
