@@ -516,6 +516,10 @@ void SendNetworkMessage(const void* data, size_t length)
     memcpy(doomcom.data, data, length);
     doomcom.datalength = (short)length;
     PacketSend();
+    
+    // Update network statistics
+    networkStats.bytesSent += length;
+    networkStats.packetsSent++;
 }
 
 void* ReceiveNetworkMessage(size_t* length)
@@ -527,7 +531,74 @@ void* ReceiveNetworkMessage(size_t* length)
         return NULL;
     }
     *length = doomcom.datalength;
+    
+    // Update network statistics
+    networkStats.bytesReceived += *length;
+    networkStats.packetsReceived++;
+    
     return doomcom.data;
+}
+
+void HandleDisconnection(int playerNum)
+{
+    if (playerNum < 0 || playerNum >= MAXPLAYERS)
+    {
+        return;
+    }
+    
+    Printf("Player %d has disconnected\n", playerNum);
+    
+    // Remove the player from the game
+    playeringame[playerNum] = false;
+    
+    // Notify other players about the disconnection
+    net_packet_t packet;
+    packet.packettype = NET_PACKET_DISCONNECT;
+    packet.player = playerNum;
+    for (int i = 0; i < MAXPLAYERS; i++)
+    {
+        if (playeringame[i] && i != playerNum)
+        {
+            SendNetworkMessage(&packet, sizeof(net_packet_t));
+        }
+    }
+    
+    // Perform any necessary cleanup
+    // ...
+}
+
+void UpdateNetworkStats()
+{
+    static uint64_t lastUpdateTime = 0;
+    uint64_t currentTime = I_GetTime();
+    
+    if (currentTime - lastUpdateTime >= TICRATE)  // Update every second
+    {
+        networkStats.pingMs = CalculateAveragePing();
+        networkStats.packetLoss = CalculatePacketLoss();
+        
+        // Reset counters
+        networkStats.bytesSent = 0;
+        networkStats.bytesReceived = 0;
+        networkStats.packetsSent = 0;
+        networkStats.packetsReceived = 0;
+        
+        lastUpdateTime = currentTime;
+    }
+}
+
+int CalculateAveragePing()
+{
+    // Implement ping calculation logic here
+    // This is a placeholder implementation
+    return 50;  // Return a dummy value of 50ms
+}
+
+float CalculatePacketLoss()
+{
+    // Implement packet loss calculation logic here
+    // This is a placeholder implementation
+    return 0.01f;  // Return a dummy value of 1% packet loss
 }
 
 bool I_StartNetworkAsServer(int port)
@@ -1434,6 +1505,15 @@ void RunNetworkGame()
             // Handle incoming connections and messages
             PacketGet();
             
+            // Check for disconnections
+            for (int i = 0; i < MAXPLAYERS; i++)
+            {
+                if (playeringame[i] && !IsPlayerConnected(i))
+                {
+                    HandleDisconnection(i);
+                }
+            }
+            
             // Process game logic
             G_Ticker();
             
@@ -1499,6 +1579,9 @@ void RunNetworkGame()
                 }
             }
         }
+
+        // Update network statistics
+        UpdateNetworkStats();
 
         // Update network diagnostics
         UpdateNetworkDiagnostics();

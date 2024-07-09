@@ -26,6 +26,21 @@ bool ConnectToNetworkGame(const char* address, int port);
 void RunNetworkGame();
 void SendNetworkMessage(const void* data, size_t length);
 void* ReceiveNetworkMessage(size_t* length);
+void HandleDisconnection(int playerNum);
+void UpdateNetworkStats();
+int CalculateAveragePing();
+float CalculatePacketLoss();
+
+struct NetworkStats {
+    uint64_t bytesSent;
+    uint64_t bytesReceived;
+    uint64_t packetsSent;
+    uint64_t packetsReceived;
+    int pingMs;
+    float packetLoss;
+};
+
+extern NetworkStats networkStats;
 
 // New variables for client/server support
 extern bool isServer;
