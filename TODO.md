@@ -78,7 +78,93 @@
     - [x] Implement separate functions for sending and receiving different types of messages (done)
     - [ ] Add message queuing system for reliable delivery
 
-20. Current file list:
+20. Implement input prediction and reconciliation
+    - [x] Add client-side input prediction
+    - [x] Implement server-side reconciliation
+    - [ ] Improve smoothing for reconciliation
+
+21. Enhance network game state synchronization
+    - [x] Implement more frequent state updates for critical game elements
+    - [ ] Add interpolation for smoother movement between updates
+    - [ ] Implement delta compression for state updates
+
+22. Improve network error handling and recovery
+    - [ ] Implement automatic reconnection attempts on connection loss
+    - [ ] Add better error messages and handling for common network issues
+
+23. Optimize network bandwidth usage
+    - [ ] Implement more efficient serialization for game state
+    - [ ] Add priority system for network messages
+
+24. Enhance multiplayer game modes
+    - [ ] Implement additional game modes (e.g., team deathmatch, capture the flag)
+    - [ ] Add support for custom game rules and modifiers
+
+25. Improve network security
+    - [ ] Implement basic anti-cheat measures
+    - [ ] Add server-side validation for critical game actions
+
+26. Enhance multiplayer UI/UX
+    - [ ] Create a more user-friendly server browser
+    - [ ] Implement a party system for playing with friends
+
+27. Add network performance monitoring
+    - [x] Implement ping measurement and display (done in DisplayNetworkStats)
+    - [x] Add network quality indicators (packet loss, jitter) (done in DisplayNetworkStats)
+
+28. Improve host migration
+    - [ ] Implement a system to handle host disconnection gracefully
+    - [ ] Add voting system for new host selection
+
+29. Enhance spectator mode
+    - [ ] Implement a spectator mode for multiplayer games
+    - [ ] Add controls for spectators to switch between players
+
+30. Implement network game saving and loading
+    - [ ] Add ability to save and load multiplayer game states
+    - [ ] Ensure synchronization when loading saved games
+
+31. Enhance network debugging tools
+    - [ ] Implement network traffic visualization
+    - [ ] Add detailed logging for network events and packet contents
+
+32. Optimize network code for different connection types
+    - [ ] Implement adaptive packet sizes based on connection quality
+    - [ ] Add support for different network protocols (TCP/UDP) based on data criticality
+
+33. Implement network game replays
+    - [ ] Add ability to record and playback multiplayer matches
+    - [ ] Implement a system for sharing and viewing replays
+
+34. Implement lag compensation techniques
+    - [ ] Add server-side lag compensation for hit detection
+    - [ ] Implement client-side movement prediction with reconciliation
+
+35. Enhance network game state compression
+    - [ ] Implement efficient compression algorithms for game state data
+    - [ ] Add support for partial state updates to reduce bandwidth usage
+
+36. Improve network game join process
+    - [ ] Implement a more robust handshake process for joining games
+    - [ ] Add support for late-join functionality in ongoing matches
+
+37. Enhance network game synchronization for physics objects
+    - [ ] Implement efficient synchronization for physics-based objects
+    - [ ] Add interpolation and extrapolation for smoother physics interactions
+
+38. Implement network game state rewinding
+    - [ ] Add ability to rewind and replay game state for reconciliation
+    - [ ] Implement an efficient storage system for historical game states
+
+39. Enhance network game time synchronization
+    - [ ] Implement a robust time synchronization system across clients
+    - [ ] Add support for handling clients with varying pings and update rates
+
+40. Implement network game state prediction
+    - [ ] Add client-side state prediction for smoother gameplay
+    - [ ] Implement server-side validation of predicted states
+
+41. Current file list:
     - src/d_main.cpp
     - src/common/thirdparty/md5.h
     - src/common/utility/cmdlib.h
@@ -97,61 +183,3 @@
     - src/d_netinfo.cpp
     - src/common/utility/engineerrors.h
     - src/common/engine/i_net.cpp
-
-21. Implement input prediction and reconciliation
-    - [x] Add client-side input prediction
-    - [x] Implement server-side reconciliation
-    - [ ] Improve smoothing for reconciliation
-
-22. Enhance network game state synchronization
-    - [x] Implement more frequent state updates for critical game elements
-    - [ ] Add interpolation for smoother movement between updates
-    - [ ] Implement delta compression for state updates
-
-23. Improve network error handling and recovery
-    - [ ] Implement automatic reconnection attempts on connection loss
-    - [ ] Add better error messages and handling for common network issues
-
-24. Optimize network bandwidth usage
-    - [ ] Implement more efficient serialization for game state
-    - [ ] Add priority system for network messages
-
-25. Enhance multiplayer game modes
-    - [ ] Implement additional game modes (e.g., team deathmatch, capture the flag)
-    - [ ] Add support for custom game rules and modifiers
-
-26. Improve network security
-    - [ ] Implement basic anti-cheat measures
-    - [ ] Add server-side validation for critical game actions
-
-27. Enhance multiplayer UI/UX
-    - [ ] Create a more user-friendly server browser
-    - [ ] Implement a party system for playing with friends
-
-28. Add network performance monitoring
-    - [x] Implement ping measurement and display (done in DisplayNetworkStats)
-    - [x] Add network quality indicators (packet loss, jitter) (done in DisplayNetworkStats)
-
-29. Improve host migration
-    - [ ] Implement a system to handle host disconnection gracefully
-    - [ ] Add voting system for new host selection
-
-30. Enhance spectator mode
-    - [ ] Implement a spectator mode for multiplayer games
-    - [ ] Add controls for spectators to switch between players
-
-31. Implement network game saving and loading
-    - [ ] Add ability to save and load multiplayer game states
-    - [ ] Ensure synchronization when loading saved games
-
-32. Enhance network debugging tools
-    - [ ] Implement network traffic visualization
-    - [ ] Add detailed logging for network events and packet contents
-
-33. Optimize network code for different connection types
-    - [ ] Implement adaptive packet sizes based on connection quality
-    - [ ] Add support for different network protocols (TCP/UDP) based on data criticality
-
-34. Implement network game replays
-    - [ ] Add ability to record and playback multiplayer matches
-    - [ ] Implement a system for sharing and viewing replays

@@ -38,9 +38,13 @@ struct NetworkStats {
     uint64_t packetsReceived;
     int pingMs;
     float packetLoss;
+    uint64_t totalPing;
+    uint64_t lastActivityTime[MAXPLAYERS];
 };
 
 extern NetworkStats networkStats;
+
+#define PLAYER_TIMEOUT 5000 // 5 seconds timeout
 
 // New variables for client/server support
 extern bool isServer;

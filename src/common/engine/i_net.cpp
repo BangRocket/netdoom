@@ -520,6 +520,7 @@ void SendNetworkMessage(const void* data, size_t length)
     // Update network statistics
     networkStats.bytesSent += length;
     networkStats.packetsSent++;
+    networkStats.totalPing += networkStats.pingMs;
 }
 
 void* ReceiveNetworkMessage(size_t* length)
@@ -535,8 +536,18 @@ void* ReceiveNetworkMessage(size_t* length)
     // Update network statistics
     networkStats.bytesReceived += *length;
     networkStats.packetsReceived++;
+    networkStats.lastActivityTime[doomcom.remotenode] = I_GetTime();
     
     return doomcom.data;
+}
+
+void InitializeNetworkStats()
+{
+    memset(&networkStats, 0, sizeof(NetworkStats));
+    for (int i = 0; i < MAXPLAYERS; i++)
+    {
+        networkStats.lastActivityTime[i] = I_GetTime();
+    }
 }
 
 void HandleDisconnection(int playerNum)
@@ -589,16 +600,20 @@ void UpdateNetworkStats()
 
 int CalculateAveragePing()
 {
-    // Implement ping calculation logic here
-    // This is a placeholder implementation
-    return 50;  // Return a dummy value of 50ms
+    if (networkStats.packetsSent == 0) return 0;
+    return networkStats.totalPing / networkStats.packetsSent;
 }
 
 float CalculatePacketLoss()
 {
-    // Implement packet loss calculation logic here
-    // This is a placeholder implementation
-    return 0.01f;  // Return a dummy value of 1% packet loss
+    if (networkStats.packetsSent == 0) return 0.0f;
+    return 1.0f - (float)networkStats.packetsReceived / networkStats.packetsSent;
+}
+
+bool IsPlayerConnected(int playerNum)
+{
+    if (playerNum < 0 || playerNum >= MAXPLAYERS) return false;
+    return networkStats.lastActivityTime[playerNum] > I_GetTime() - PLAYER_TIMEOUT;
 }
 
 bool I_StartNetworkAsServer(int port)
