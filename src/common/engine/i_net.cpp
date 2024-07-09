@@ -444,6 +444,29 @@ void PacketGet (void)
 	doomcom.datalength = (short)c;
 }
 
+void SendNetworkMessage(const void* data, size_t length)
+{
+    if (length > MAX_MSGLEN)
+    {
+        I_Error("SendNetworkMessage: Message too large");
+    }
+    memcpy(doomcom.data, data, length);
+    doomcom.datalength = (short)length;
+    PacketSend();
+}
+
+void* ReceiveNetworkMessage(size_t* length)
+{
+    PacketGet();
+    if (doomcom.remotenode == -1)
+    {
+        *length = 0;
+        return NULL;
+    }
+    *length = doomcom.datalength;
+    return doomcom.data;
+}
+
 sockaddr_in *PreGet (void *buffer, int bufferlen, bool noabort)
 {
 	static sockaddr_in fromaddress;

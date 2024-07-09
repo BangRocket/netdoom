@@ -20,6 +20,10 @@ void I_RunNetworkClient();
 void PacketSend();
 void PacketGet();
 
+// New functions for network message handling
+void SendNetworkMessage(const void* data, size_t length);
+void* ReceiveNetworkMessage(size_t* length);
+
 enum ENetConstants
 {
 	MAXNETNODES = 32,	// Increased max computers in a game
