@@ -3703,6 +3703,25 @@ static int D_DoomMain_Internal (void)
 	std::set_new_handler(NewFailure);
 	const char *batchout = Args->CheckValue("-errorlog");
 
+	// Initialize network functionality
+	if (Args->CheckParm("-server"))
+	{
+		int port = Args->CheckParm("-port") ? atoi(Args->GetArg(Args->CheckParm("-port") + 1)) : DEFAULT_PORT;
+		if (!StartNetworkGame(port))
+		{
+			I_FatalError("Failed to start network game as server");
+		}
+	}
+	else if (Args->CheckParm("-connect"))
+	{
+		const char* address = Args->GetArg(Args->CheckParm("-connect") + 1);
+		int port = Args->CheckParm("-port") ? atoi(Args->GetArg(Args->CheckParm("-port") + 1)) : DEFAULT_PORT;
+		if (!ConnectToNetworkGame(address, port))
+		{
+			I_FatalError("Failed to connect to network game");
+		}
+	}
+
 	D_DoomInit();
 	
 	// [RH] Make sure zdoom.pk3 is always loaded,
