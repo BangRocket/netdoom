@@ -83,6 +83,23 @@
 bool isServer = false;
 bool isClient = false;
 
+// Game state structures
+struct PlayerState {
+    double x, y, z;
+    double angle;
+    int health;
+};
+
+struct GameState {
+    int gametic;
+    int consoleplayer;
+    PlayerState playerStates[MAXPLAYERS];
+};
+
+// New variables for client/server support
+bool isServer = false;
+bool isClient = false;
+
 // New functions for client/server support
 bool I_StartNetworkAsServer(int port)
 {
@@ -511,6 +528,113 @@ void* ReceiveNetworkMessage(size_t* length)
     }
     *length = doomcom.datalength;
     return doomcom.data;
+}
+
+bool I_StartNetworkAsServer(int port)
+{
+    isServer = true;
+    isClient = false;
+    
+    // Initialize server socket
+    mysocket = UDPsocket();
+    if (mysocket == INVALID_SOCKET)
+    {
+        I_Error("I_StartNetworkAsServer: Unable to create socket");
+        return false;
+    }
+    
+    BindToLocalPort(mysocket, port);
+    
+    Printf("Server started on port %d\n", port);
+    return true;
+}
+
+bool I_ConnectToServer(const char* address, int port)
+{
+    isServer = false;
+    isClient = true;
+    
+    // Initialize client socket
+    mysocket = UDPsocket();
+    if (mysocket == INVALID_SOCKET)
+    {
+        I_Error("I_ConnectToServer: Unable to create socket");
+        return false;
+    }
+    
+    // Connect to server
+    sockaddr_in serverAddress;
+    memset(&serverAddress, 0, sizeof(serverAddress));
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_addr.s_addr = inet_addr(address);
+    serverAddress.sin_port = htons(port);
+    
+    if (connect(mysocket, (sockaddr*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR)
+    {
+        I_Error("I_ConnectToServer: Unable to connect to server");
+        return false;
+    }
+    
+    Printf("Connected to server at %s:%d\n", address, port);
+    return true;
+}
+
+void I_RunNetworkServer()
+{
+    if (!isServer) return;
+    
+    // Handle incoming connections and messages
+    PacketGet();
+    
+    // Process game logic
+    G_Ticker();
+    
+    // Send updates to clients
+    GameState gameState;
+    gameState.gametic = gametic;
+    gameState.consoleplayer = consoleplayer;
+    for (int i = 0; i < MAXPLAYERS; i++)
+    {
+        if (playeringame[i])
+        {
+            gameState.playerStates[i].x = players[i].mo->X();
+            gameState.playerStates[i].y = players[i].mo->Y();
+            gameState.playerStates[i].z = players[i].mo->Z();
+            gameState.playerStates[i].angle = players[i].mo->Angles.Yaw.Degrees();
+            gameState.playerStates[i].health = players[i].health;
+        }
+    }
+    
+    SendNetworkMessage(&gameState, sizeof(GameState));
+}
+
+void I_RunNetworkClient()
+{
+    if (!isClient) return;
+    
+    // Send player input to server
+    ticcmd_t cmd;
+    G_BuildTiccmd(&cmd);
+    SendNetworkMessage(&cmd, sizeof(ticcmd_t));
+    
+    // Receive updates from server
+    size_t length;
+    void* receivedData = ReceiveNetworkMessage(&length);
+    if (receivedData && length >= sizeof(GameState))
+    {
+        GameState* gameState = (GameState*)receivedData;
+        gametic = gameState->gametic;
+        consoleplayer = gameState->consoleplayer;
+        for (int i = 0; i < MAXPLAYERS; i++)
+        {
+            if (playeringame[i])
+            {
+                players[i].mo->SetXYZ(gameState->playerStates[i].x, gameState->playerStates[i].y, gameState->playerStates[i].z);
+                players[i].mo->Angles.Yaw = gameState->playerStates[i].angle;
+                players[i].health = gameState->playerStates[i].health;
+            }
+        }
+    }
 }
 
 sockaddr_in *PreGet (void *buffer, int bufferlen, bool noabort)
