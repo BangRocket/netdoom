@@ -247,6 +247,7 @@ endif()
 option (HAVE_VULKAN "Enable Vulkan support" ON)
 option (HAVE_GLES2 "Enable GLES2 support" ON)
 option (ENABLE_TESTS "Enable building and running tests" ON)
+option (ENABLE_SANITIZERS "Enable Address Sanitizer and Undefined Behavior Sanitizer" OFF)
 
 # no, we're not using external asmjit for now, we made too many modifications to our's.
 # if the asmjit author uses our changes then we'll update this.
@@ -440,6 +441,15 @@ add_subdirectory( wadsrc_widepix )
 add_subdirectory( src )
 if(ENABLE_TESTS)
     add_subdirectory( tests )
+endif()
+
+if(ENABLE_SANITIZERS)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined -fno-omit-frame-pointer")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address,undefined")
+    else()
+        message(WARNING "Sanitizers are only supported with GCC and Clang")
+    endif()
 endif()
 
 if( NOT CMAKE_CROSSCOMPILING )

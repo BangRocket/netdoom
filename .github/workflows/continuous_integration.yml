@@ -111,5 +111,14 @@ jobs:
     - name: Run Network Tests
       shell: bash
       run: |
-        cd build/network_tests
+        cd build/tests
         ./run_network_tests.sh
+
+    - name: Run Sanitizer Tests
+      if: matrix.config.build_type == 'Debug' && (matrix.config.name == 'Linux GCC' || matrix.config.name == 'Linux Clang')
+      shell: bash
+      run: |
+        cd build
+        cmake -DENABLE_SANITIZERS=ON ..
+        cmake --build . --config Debug
+        ctest -C Debug --output-on-failure --timeout 300
