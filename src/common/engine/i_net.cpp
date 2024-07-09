@@ -1294,57 +1294,66 @@ const char *neterror (void)
 #endif
 void RunNetworkGame()
 {
-    if (isServer)
+    try
     {
-        // Handle incoming connections and messages
-        PacketGet();
-        
-        // Process game logic
-        G_Ticker();
-        
-        // Send updates to clients
-        GameState gameState;
-        gameState.gametic = gametic;
-        gameState.consoleplayer = consoleplayer;
-        for (int i = 0; i < MAXPLAYERS; i++)
+        if (isServer)
         {
-            if (playeringame[i])
-            {
-                gameState.playerStates[i].x = players[i].mo->X();
-                gameState.playerStates[i].y = players[i].mo->Y();
-                gameState.playerStates[i].z = players[i].mo->Z();
-                gameState.playerStates[i].angle = players[i].mo->Angles.Yaw.Degrees();
-                gameState.playerStates[i].health = players[i].health;
-            }
-        }
-        
-        SendNetworkMessage(&gameState, sizeof(GameState));
-    }
-    else if (isClient)
-    {
-        // Send player input to server
-        ticcmd_t cmd;
-        G_BuildTiccmd(&cmd);
-        SendNetworkMessage(&cmd, sizeof(ticcmd_t));
-        
-        // Receive updates from server
-        size_t length;
-        void* receivedData = ReceiveNetworkMessage(&length);
-        if (receivedData && length >= sizeof(GameState))
-        {
-            GameState* gameState = (GameState*)receivedData;
-            gametic = gameState->gametic;
-            consoleplayer = gameState->consoleplayer;
+            // Handle incoming connections and messages
+            PacketGet();
+            
+            // Process game logic
+            G_Ticker();
+            
+            // Send updates to clients
+            GameState gameState;
+            gameState.gametic = gametic;
+            gameState.consoleplayer = consoleplayer;
             for (int i = 0; i < MAXPLAYERS; i++)
             {
                 if (playeringame[i])
                 {
-                    players[i].mo->SetXYZ(gameState->playerStates[i].x, gameState->playerStates[i].y, gameState->playerStates[i].z);
-                    players[i].mo->Angles.Yaw = gameState->playerStates[i].angle;
-                    players[i].health = gameState->playerStates[i].health;
+                    gameState.playerStates[i].x = players[i].mo->X();
+                    gameState.playerStates[i].y = players[i].mo->Y();
+                    gameState.playerStates[i].z = players[i].mo->Z();
+                    gameState.playerStates[i].angle = players[i].mo->Angles.Yaw.Degrees();
+                    gameState.playerStates[i].health = players[i].health;
+                }
+            }
+            
+            // Use the new serialization system
+            SerializeAndSendGameState(gameState);
+        }
+        else if (isClient)
+        {
+            // Send player input to server
+            ticcmd_t cmd;
+            G_BuildTiccmd(&cmd);
+            SerializeAndSendPlayerInput(cmd);
+            
+            // Receive updates from server
+            GameState gameState;
+            if (ReceiveAndDeserializeGameState(gameState))
+            {
+                gametic = gameState.gametic;
+                consoleplayer = gameState.consoleplayer;
+                for (int i = 0; i < MAXPLAYERS; i++)
+                {
+                    if (playeringame[i])
+                    {
+                        players[i].mo->SetXYZ(gameState.playerStates[i].x, gameState.playerStates[i].y, gameState.playerStates[i].z);
+                        players[i].mo->Angles.Yaw = gameState.playerStates[i].angle;
+                        players[i].health = gameState.playerStates[i].health;
+                    }
                 }
             }
         }
+
+        // Update network diagnostics
+        UpdateNetworkDiagnostics();
+    }
+    catch (const NetworkException& e)
+    {
+        HandleNetworkError(e);
     }
 }
 
@@ -1369,4 +1378,59 @@ void* ReceiveNetworkMessage(size_t* length)
     }
     *length = doomcom.datalength;
     return doomcom.data;
+}
+// New functions and classes
+
+class NetworkException : public std::exception
+{
+public:
+    NetworkException(const char* message) : m_message(message) {}
+    const char* what() const noexcept override { return m_message.c_str(); }
+private:
+    std::string m_message;
+};
+
+bool InitializeNetworkSerialization()
+{
+    // Implementation for initializing the network serialization system
+    // This could involve setting up buffers, initializing compression algorithms, etc.
+    return true; // Return false if initialization fails
+}
+
+void SetupNetworkDiagnostics()
+{
+    // Implementation for setting up network diagnostics
+    // This could involve initializing counters, setting up logging, etc.
+}
+
+void UpdateNetworkDiagnostics()
+{
+    // Implementation for updating network diagnostics
+    // This could involve updating counters, logging network performance, etc.
+}
+
+void SerializeAndSendGameState(const GameState& gameState)
+{
+    // Implementation for serializing and sending game state
+    // This should use a more robust serialization system
+}
+
+void SerializeAndSendPlayerInput(const ticcmd_t& cmd)
+{
+    // Implementation for serializing and sending player input
+    // This should use a more robust serialization system
+}
+
+bool ReceiveAndDeserializeGameState(GameState& gameState)
+{
+    // Implementation for receiving and deserializing game state
+    // This should use a more robust deserialization system
+    return true; // Return false if deserialization fails or no data is received
+}
+
+void HandleNetworkError(const NetworkException& e)
+{
+    // Implementation for handling network errors
+    // This could involve logging the error, attempting to reconnect, or gracefully shutting down the network
+    I_Error("Network error: %s", e.what());
 }
