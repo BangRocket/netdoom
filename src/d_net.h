@@ -76,10 +76,6 @@ void Net_WriteBytes (const uint8_t *bytes, int len);
 void Net_DoCommand (int type, uint8_t **stream, int player);
 void Net_SkipCommand (int type, uint8_t **stream);
 
-// New functions for improved network functionality
-bool Net_IsConnected();
-int Net_GetLatency();
-void Net_Disconnect();
 
 void Net_ClearBuffers ();
 
