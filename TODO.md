@@ -26,7 +26,7 @@
    - [ ] Add bandwidth throttling and prioritization of network messages
 
 7. Improve player connection/disconnection handling
-   - [ ] Implement graceful disconnection handling
+   - [x] Implement graceful disconnection handling (HandleDisconnection function added)
    - [ ] Add reconnection functionality for temporarily disconnected players
 
 8. Create a more robust matchmaking system
@@ -38,7 +38,7 @@
    - [ ] Implement push-to-talk and always-on voice options
 
 10. Add network diagnostics and debugging tools
-    - [x] Create a network statistics display for players (SetupNetworkDiagnostics and UpdateNetworkDiagnostics functions added)
+    - [x] Create a network statistics display for players (DisplayNetworkStats function added)
     - [ ] Implement logging for network-related events and errors
 
 11. Enhance the user interface for multiplayer features
@@ -129,8 +129,8 @@
     - [ ] Implement a party system for playing with friends
 
 28. Add network performance monitoring
-    - [ ] Implement ping measurement and display
-    - [ ] Add network quality indicators (packet loss, jitter)
+    - [x] Implement ping measurement and display (done in DisplayNetworkStats)
+    - [x] Add network quality indicators (packet loss, jitter) (done in DisplayNetworkStats)
 
 29. Improve host migration
     - [ ] Implement a system to handle host disconnection gracefully
@@ -139,3 +139,19 @@
 30. Enhance spectator mode
     - [ ] Implement a spectator mode for multiplayer games
     - [ ] Add controls for spectators to switch between players
+
+31. Implement network game saving and loading
+    - [ ] Add ability to save and load multiplayer game states
+    - [ ] Ensure synchronization when loading saved games
+
+32. Enhance network debugging tools
+    - [ ] Implement network traffic visualization
+    - [ ] Add detailed logging for network events and packet contents
+
+33. Optimize network code for different connection types
+    - [ ] Implement adaptive packet sizes based on connection quality
+    - [ ] Add support for different network protocols (TCP/UDP) based on data criticality
+
+34. Implement network game replays
+    - [ ] Add ability to record and playback multiplayer matches
+    - [ ] Implement a system for sharing and viewing replays
