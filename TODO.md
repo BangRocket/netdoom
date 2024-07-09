@@ -182,4 +182,61 @@
     - src/common/thirdparty/m_crc32.h
     - src/d_netinfo.cpp
     - src/common/utility/engineerrors.h
-    - src/common/engine/i_net.cpp
+    - src/common/engine/i_net.cpp# Build System Refactoring TODO
+
+## 1. CMakePresets.json
+- [ ] Create CMakePresets.json file for common build configurations
+- [ ] Define presets for Debug, Release, and RelWithDebInfo builds
+- [ ] Include platform-specific presets for Windows, macOS, and Linux
+
+## 2. Dependency Management
+- [ ] Implement Conan or vcpkg for third-party library management
+- [ ] Update CMakeLists.txt files to use package manager for dependencies
+- [ ] Remove FetchContent declarations for zlib, bzip2, and asmjit
+
+## 3. Modularization
+- [ ] Create separate CMake files for platform-specific code
+- [ ] Move Windows-specific code to cmake/platform_windows.cmake
+- [ ] Move macOS-specific code to cmake/platform_macos.cmake
+- [ ] Move Linux-specific code to cmake/platform_linux.cmake
+- [ ] Update main CMakeLists.txt to include platform-specific files
+
+## 4. Compiler Flags
+- [ ] Refactor compiler flag setting in main CMakeLists.txt
+- [ ] Create functions for setting common flags across targets
+- [ ] Implement separate compile options for different build types
+
+## 5. Target Management
+- [ ] Reorganize target definitions in src/CMakeLists.txt
+- [ ] Group related targets and their properties
+- [ ] Implement better handling of optional features (e.g., VM JIT)
+
+## 6. Installation and Packaging
+- [ ] Improve installation rules in main CMakeLists.txt
+- [ ] Create CPack configuration for generating installers
+- [ ] Implement platform-specific packaging options
+
+## 7. Build Optimization
+- [ ] Implement parallel compilation where possible
+- [ ] Optimize include directories to reduce compilation time
+- [ ] Investigate and implement precompiled headers for major components
+
+## 8. Testing
+- [ ] Set up CTest integration for running tests
+- [ ] Create test targets for different components
+- [ ] Implement code coverage reporting
+
+## 9. Documentation
+- [ ] Update README.md with new build instructions
+- [ ] Create BUILDING.md with detailed build process explanation
+- [ ] Document new CMake options and their effects
+
+## 10. Continuous Integration
+- [ ] Update CI scripts to use new CMake presets
+- [ ] Implement matrix builds for different configurations
+- [ ] Set up automated package generation in CI
+
+## 11. Cleanup
+- [ ] Remove deprecated or unused CMake code
+- [ ] Ensure consistent naming conventions across CMake files
+- [ ] Refactor redundant code into reusable functions or macros
