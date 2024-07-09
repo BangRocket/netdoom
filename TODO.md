@@ -59,3 +59,23 @@
 15. Implement cross-platform multiplayer
     - Ensure network code is compatible across different platforms
     - Add platform-specific optimizations where necessary
+
+16. Current file list:
+    - src/d_main.cpp
+    - src/common/thirdparty/md5.h
+    - src/common/utility/cmdlib.h
+    - src/common/engine/st_start.h
+    - src/common/engine/i_interface.h
+    - src/common/engine/filesystem.h
+    - src/d_protocol.h
+    - src/common/engine/printf.h
+    - src/common/utility/m_argv.h
+    - src/common/engine/i_net.h
+    - src/common/engine/files.h
+    - src/common/filesystem/include/fs_findfile.h
+    - src/doomtype.h
+    - src/common/utility/cmdlib.cpp
+    - src/common/thirdparty/m_crc32.h
+    - src/d_netinfo.cpp
+    - src/common/utility/engineerrors.h
+    - src/common/engine/i_net.cpp
