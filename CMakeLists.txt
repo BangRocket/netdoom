@@ -49,6 +49,11 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR (NOT CMAKE_SYSTEM_NAME AND CMAKE_HOS
 	set(VCPKG_TARGET_TRIPLET "x64-windows-static")
 endif()
 
+# Set the generator platform before calling project()
+if(CMAKE_GENERATOR MATCHES "Visual Studio")
+    set(CMAKE_GENERATOR_PLATFORM x64 CACHE STRING "" FORCE)
+endif()
+
 project(GZDoom)
 
 if (WIN32 AND VCPKG_TOOLCHAIN)
