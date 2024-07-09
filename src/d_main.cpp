@@ -1256,6 +1256,12 @@ void D_DoomLoop ()
 			D_Display ();
 			S_UpdateMusic();
 
+			// Update network statistics
+			UpdateNetworkStats();
+
+			// Display network statistics
+			DisplayNetworkStats();
+
 			if (netgame)
 			{
 				// Send and receive network messages
