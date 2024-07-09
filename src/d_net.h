@@ -64,17 +64,22 @@ void Net_CheckLastReceived(int);
 
 // [RH] Functions for making and using special "ticcmds"
 void Net_NewMakeTic ();
-void Net_WriteInt8 (uint8_t);
-void Net_WriteInt16 (int16_t);
-void Net_WriteInt32 (int32_t);
-void Net_WriteInt64(int64_t);
-void Net_WriteFloat (float);
-void Net_WriteDouble(double);
-void Net_WriteString (const char *);
-void Net_WriteBytes (const uint8_t *, int len);
+void Net_WriteInt8 (uint8_t value);
+void Net_WriteInt16 (int16_t value);
+void Net_WriteInt32 (int32_t value);
+void Net_WriteInt64(int64_t value);
+void Net_WriteFloat (float value);
+void Net_WriteDouble(double value);
+void Net_WriteString (const char *str);
+void Net_WriteBytes (const uint8_t *bytes, int len);
 
 void Net_DoCommand (int type, uint8_t **stream, int player);
 void Net_SkipCommand (int type, uint8_t **stream);
+
+// New functions for improved network functionality
+bool Net_IsConnected();
+int Net_GetLatency();
+void Net_Disconnect();
 
 void Net_ClearBuffers ();
 
