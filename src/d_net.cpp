@@ -364,6 +364,48 @@ void Net_ClearBuffers ()
 	lastglobalrecvtime = 0;
 }
 
+// New functions for improved network functionality
+bool NET_ConnectToServer(const std::string& serverAddress, int serverPort)
+{
+    // Implementation for connecting to server
+    // This is a placeholder and needs to be implemented
+    return true;
+}
+
+void NET_DisconnectFromServer()
+{
+    // Implementation for disconnecting from server
+    // This is a placeholder and needs to be implemented
+}
+
+bool NET_SendPacket(NetPacketType type, const void* data, size_t size)
+{
+    // Implementation for sending a packet
+    // This is a placeholder and needs to be implemented
+    return true;
+}
+
+bool NET_ReceivePacket(NetPacketType* type, void* data, size_t* size)
+{
+    // Implementation for receiving a packet
+    // This is a placeholder and needs to be implemented
+    return true;
+}
+
+int NET_GetLatency()
+{
+    // Implementation for getting current latency
+    // This is a placeholder and needs to be implemented
+    return 0;
+}
+
+bool NET_IsConnected()
+{
+    // Implementation for checking if connected
+    // This is a placeholder and needs to be implemented
+    return true;
+}
+
 //
 // [RH] Rewritten to properly calculate the packet size
 //		with our variable length commands.
