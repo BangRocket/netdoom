@@ -1146,11 +1146,15 @@ int I_InitNetwork (void)
 	//		player x: -join <player 1's address>
 	if ( (i = Args->CheckParm ("-host")) )
 	{
-		if (!HostGame (i)) return -1;
+		if (!StartNetworkGame(DOOMPORT)) return -1;
+		isServer = true;
+		isClient = false;
 	}
 	else if ( (i = Args->CheckParm ("-join")) )
 	{
-		if (!JoinGame (i)) return -1;
+		if (!ConnectToNetworkGame(Args->GetArg(i+1), DOOMPORT)) return -1;
+		isServer = false;
+		isClient = true;
 	}
 	else
 	{
@@ -1162,12 +1166,14 @@ int I_InitNetwork (void)
 		doomcom.consoleplayer = 0;
 		return false;
 	}
-	if (doomcom.numnodes < 3)
-	{ // Packet server mode with only two players is effectively the same as
-	  // peer-to-peer but with some slightly larger packets.
-		return false;
-	}
-	return doomcom.numnodes > 3 || !NodesOnSameNetwork();
+
+	netgame = true;
+	multiplayer = true;
+	doomcom.id = DOOMCOM_ID;
+	doomcom.numplayers = doomcom.numnodes = 1; // Will be updated as players join
+	doomcom.consoleplayer = isServer ? 0 : 1; // Server is always player 0
+
+	return true;
 }
 
 
@@ -1278,3 +1284,81 @@ const char *neterror (void)
 	}
 }
 #endif
+void RunNetworkGame()
+{
+    if (isServer)
+    {
+        // Handle incoming connections and messages
+        PacketGet();
+        
+        // Process game logic
+        G_Ticker();
+        
+        // Send updates to clients
+        GameState gameState;
+        gameState.gametic = gametic;
+        gameState.consoleplayer = consoleplayer;
+        for (int i = 0; i < MAXPLAYERS; i++)
+        {
+            if (playeringame[i])
+            {
+                gameState.playerStates[i].x = players[i].mo->X();
+                gameState.playerStates[i].y = players[i].mo->Y();
+                gameState.playerStates[i].z = players[i].mo->Z();
+                gameState.playerStates[i].angle = players[i].mo->Angles.Yaw.Degrees();
+                gameState.playerStates[i].health = players[i].health;
+            }
+        }
+        
+        SendNetworkMessage(&gameState, sizeof(GameState));
+    }
+    else if (isClient)
+    {
+        // Send player input to server
+        ticcmd_t cmd;
+        G_BuildTiccmd(&cmd);
+        SendNetworkMessage(&cmd, sizeof(ticcmd_t));
+        
+        // Receive updates from server
+        size_t length;
+        void* receivedData = ReceiveNetworkMessage(&length);
+        if (receivedData && length >= sizeof(GameState))
+        {
+            GameState* gameState = (GameState*)receivedData;
+            gametic = gameState->gametic;
+            consoleplayer = gameState->consoleplayer;
+            for (int i = 0; i < MAXPLAYERS; i++)
+            {
+                if (playeringame[i])
+                {
+                    players[i].mo->SetXYZ(gameState->playerStates[i].x, gameState->playerStates[i].y, gameState->playerStates[i].z);
+                    players[i].mo->Angles.Yaw = gameState->playerStates[i].angle;
+                    players[i].health = gameState->playerStates[i].health;
+                }
+            }
+        }
+    }
+}
+
+void SendNetworkMessage(const void* data, size_t length)
+{
+    if (length > MAX_MSGLEN)
+    {
+        I_Error("SendNetworkMessage: Message too large");
+    }
+    memcpy(doomcom.data, data, length);
+    doomcom.datalength = (short)length;
+    PacketSend();
+}
+
+void* ReceiveNetworkMessage(size_t* length)
+{
+    PacketGet();
+    if (doomcom.remotenode == -1)
+    {
+        *length = 0;
+        return NULL;
+    }
+    *length = doomcom.datalength;
+    return doomcom.data;
+}
