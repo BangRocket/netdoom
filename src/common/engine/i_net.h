@@ -24,6 +24,22 @@ void PacketGet();
 void SendNetworkMessage(const void* data, size_t length);
 void* ReceiveNetworkMessage(size_t* length);
 
+// New variables for client/server support
+extern bool isServer;
+extern bool isClient;
+#define MAX_CLIENTS 16
+extern int numClients;
+struct ClientInfo {
+    sockaddr_in address;
+    int player;
+};
+extern ClientInfo clients[MAX_CLIENTS];
+
+// New functions for client management
+bool AddClient(const sockaddr_in* address);
+void RemoveClient(const sockaddr_in* address);
+int GetClientPlayer(const sockaddr_in* address);
+
 enum ENetConstants
 {
 	MAXNETNODES = 32,	// Increased max computers in a game

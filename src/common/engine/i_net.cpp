@@ -137,37 +137,44 @@ void I_RunNetworkServer()
 {
     if (!isServer) return;
     
-    // Simple server loop
-    while (true)
-    {
-        // Handle incoming connections and messages
-        PacketGet();
-        
-        // Process game logic
-        // ...
-        
-        // Send updates to clients
-        PacketSend();
-    }
+    // Handle incoming connections and messages
+    PacketGet();
+    
+    // Process game logic
+    G_Ticker();
+    
+    // Send updates to clients
+    GameState gameState;
+    gameState.gametic = gametic;
+    // TODO: Add more game state data
+    
+    SendNetworkMessage(&gameState, sizeof(GameState));
 }
 
 void I_RunNetworkClient()
 {
     if (!isClient) return;
     
-    // Simple client loop
-    while (true)
+    // Send player input to server
+    ticcmd_t cmd;
+    G_BuildTiccmd(&cmd);
+    SendNetworkMessage(&cmd, sizeof(ticcmd_t));
+    
+    // Receive updates from server
+    size_t length;
+    void* receivedData = ReceiveNetworkMessage(&length);
+    if (receivedData && length >= sizeof(GameState))
     {
-        // Send player input to server
-        PacketSend();
-        
-        // Receive updates from server
-        PacketGet();
-        
-        // Update game state
-        // ...
+        GameState* gameState = (GameState*)receivedData;
+        // TODO: Update local game state with received data
+        gametic = gameState->gametic;
     }
 }
+
+struct GameState {
+    int gametic;
+    // TODO: Add more game state data
+};
 
 // As per http://support.microsoft.com/kb/q192599/ the standard
 // size for network buffers is 8k.
