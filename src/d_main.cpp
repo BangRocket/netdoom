@@ -1209,6 +1209,8 @@ void D_DoomLoop ()
 
 	vid_cursor->Callback();
 
+	InitializeNetworkStats();
+
 	for (;;)
 	{
 		try
@@ -4110,4 +4112,15 @@ CCMD(type)
 		auto data = fileSystem.ReadFile(lump);
 		Printf("%.*s\n", data.size(), data.string());
 	}
+}
+void DisplayNetworkStats()
+{
+    if (!netgame) return;
+
+    FString stats;
+    stats.Format("Ping: %dms, Packet Loss: %.2f%%", networkStats.pingMs, networkStats.packetLoss * 100);
+
+    // Display the stats on the screen
+    // This is a simple example, you might want to integrate this with your existing HUD
+    screen->DrawText(SmallFont, CR_WHITE, 10, 10, stats, TAG_DONE);
 }
