@@ -42,6 +42,8 @@ struct GameState {
     int gametic;
     int consoleplayer;
     PlayerState playerStates[MAXPLAYERS];
+    int lastProcessedInput[MAXPLAYERS];
+    bool isReconciling[MAXPLAYERS];
 };
 
 // New functions for network message handling

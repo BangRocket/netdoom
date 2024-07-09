@@ -1326,6 +1326,8 @@ void RunNetworkGame()
                     gameState.playerStates[i].z = players[i].mo->Z();
                     gameState.playerStates[i].angle = players[i].mo->Angles.Yaw.Degrees();
                     gameState.playerStates[i].health = players[i].health;
+                    gameState.lastProcessedInput[i] = players[i].lastProcessedInput;
+                    gameState.isReconciling[i] = false;
                 }
             }
             
@@ -1337,7 +1339,12 @@ void RunNetworkGame()
             // Send player input to server
             ticcmd_t cmd;
             G_BuildTiccmd(&cmd);
+            players[consoleplayer].lastSentInput++;
+            cmd.consistancy = players[consoleplayer].lastSentInput;
             SerializeAndSendPlayerInput(cmd);
+            
+            // Predict player movement
+            PredictPlayerMovement(players[consoleplayer], cmd);
             
             // Receive updates from server
             GameState gameState;
@@ -1349,9 +1356,18 @@ void RunNetworkGame()
                 {
                     if (playeringame[i])
                     {
-                        players[i].mo->SetXYZ(gameState.playerStates[i].x, gameState.playerStates[i].y, gameState.playerStates[i].z);
-                        players[i].mo->Angles.Yaw = gameState.playerStates[i].angle;
-                        players[i].health = gameState.playerStates[i].health;
+                        if (i == consoleplayer)
+                        {
+                            // Reconcile client-side prediction
+                            ReconcileClientPrediction(players[i], gameState.playerStates[i], gameState.lastProcessedInput[i]);
+                        }
+                        else
+                        {
+                            // Update other players
+                            players[i].mo->SetXYZ(gameState.playerStates[i].x, gameState.playerStates[i].y, gameState.playerStates[i].z);
+                            players[i].mo->Angles.Yaw = gameState.playerStates[i].angle;
+                            players[i].health = gameState.playerStates[i].health;
+                        }
                     }
                 }
             }
@@ -1363,6 +1379,37 @@ void RunNetworkGame()
     catch (const NetworkException& e)
     {
         HandleNetworkError(e);
+    }
+}
+
+void PredictPlayerMovement(player_t& player, const ticcmd_t& cmd)
+{
+    // Implement client-side prediction logic here
+    // This should mimic the server-side movement logic
+    // For example:
+    player.mo->Vel.X += cmd.forwardmove * player.mo->Speed;
+    player.mo->Vel.Y += cmd.sidemove * player.mo->Speed;
+    player.mo->SetXYZ(player.mo->Pos.X + player.mo->Vel.X, player.mo->Pos.Y + player.mo->Vel.Y, player.mo->Pos.Z);
+}
+
+void ReconcileClientPrediction(player_t& player, const PlayerState& serverState, int lastProcessedInput)
+{
+    // Implement reconciliation logic here
+    // Compare the server state with the predicted state and adjust if necessary
+    if (player.lastProcessedInput < lastProcessedInput)
+    {
+        // Server has processed new input, update the client's state
+        player.mo->SetXYZ(serverState.x, serverState.y, serverState.z);
+        player.mo->Angles.Yaw = serverState.angle;
+        player.health = serverState.health;
+        player.lastProcessedInput = lastProcessedInput;
+        
+        // Reapply any inputs that haven't been processed by the server yet
+        for (int i = lastProcessedInput + 1; i <= player.lastSentInput; i++)
+        {
+            ticcmd_t cmd = GetStoredCommand(i); // Implement this function to retrieve stored commands
+            PredictPlayerMovement(player, cmd);
+        }
     }
 }
 
