@@ -75,6 +75,7 @@ cmake -A x64 -S .. -B . ^
 	-DZMUSIC_INCLUDE_DIR=./zmusic/include ^
 	-DZMUSIC_LIBRARIES=./zmusic/build/source/Release/zmusic.lib ^
 	-DVCPKG_INSTALLLED_DIR=./vcpkg_installed/
+.\vcpkg\vcpkg install bzip2:x64-windows-static libvpx:x64-windows-static
 cmake --build . --config RelWithDebInfo -- -maxcpucount -verbosity:minimal
 
 rem -- If successful, show the build

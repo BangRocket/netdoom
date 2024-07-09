@@ -92,6 +92,7 @@ cmake -S .. -B . \
 	-DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	-DVCPKG_INSTALLLED_DIR=./vcpkg_installed/
+./vcpkg/vcpkg install bzip2 libvpx
 make -j $(nproc); rc=$?
 
 # -- If successful, show the build
