@@ -364,46 +364,43 @@ void Net_ClearBuffers ()
 	lastglobalrecvtime = 0;
 }
 
-// New functions for improved network functionality
-bool NET_ConnectToServer(const std::string& serverAddress, int serverPort)
+// Improved network functionality integrated with existing code
+
+bool NET_ConnectToServer(const char* address, int port)
 {
-    // Implementation for connecting to server
-    // This is a placeholder and needs to be implemented
-    return true;
+    // Use existing network initialization code
+    return I_InitNetwork();
 }
 
 void NET_DisconnectFromServer()
 {
-    // Implementation for disconnecting from server
-    // This is a placeholder and needs to be implemented
+    // Use existing network shutdown code
+    D_QuitNetGame();
 }
 
-bool NET_SendPacket(NetPacketType type, const void* data, size_t size)
+bool NET_SendPacket(int node, int len)
 {
-    // Implementation for sending a packet
-    // This is a placeholder and needs to be implemented
+    // Use existing packet sending function
+    HSendPacket(node, len);
     return true;
 }
 
-bool NET_ReceivePacket(NetPacketType* type, void* data, size_t* size)
+bool NET_ReceivePacket()
 {
-    // Implementation for receiving a packet
-    // This is a placeholder and needs to be implemented
-    return true;
+    // Use existing packet receiving function
+    return HGetPacket();
 }
 
-int NET_GetLatency()
+int NET_GetLatency(int *ld, int *ad)
 {
-    // Implementation for getting current latency
-    // This is a placeholder and needs to be implemented
-    return 0;
+    // Use existing latency calculation function
+    return Net_GetLatency(ld, ad);
 }
 
 bool NET_IsConnected()
 {
-    // Implementation for checking if connected
-    // This is a placeholder and needs to be implemented
-    return true;
+    // Check if we're in a netgame
+    return netgame;
 }
 
 //
