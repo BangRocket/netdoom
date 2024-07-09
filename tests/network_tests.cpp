@@ -2,18 +2,30 @@
 #include "d_net.h"  // Assuming this is the header for network-related functions
 
 TEST(NetworkTest, ConnectionEstablishment) {
-    // Test connection establishment
-    EXPECT_TRUE(I_InitNetwork());
+    EXPECT_TRUE(NET_ConnectToServer("localhost", 12345));
 }
 
 TEST(NetworkTest, DataTransmission) {
-    // Test data transmission
     const char* test_data = "Hello, World!";
-    EXPECT_TRUE(NET_SendPacket(1, test_data, strlen(test_data)));
-    // Note: You'll need to implement a way to receive and verify the data
+    EXPECT_TRUE(NET_SendPacket(NetPacketType::PlayerUpdate, test_data, strlen(test_data)));
+    
+    // Receive and verify the data
+    NetPacketType receivedType;
+    char receivedData[MAX_PACKET_SIZE];
+    size_t receivedSize = MAX_PACKET_SIZE;
+    EXPECT_TRUE(NET_ReceivePacket(&receivedType, receivedData, &receivedSize));
+    EXPECT_EQ(receivedType, NetPacketType::PlayerUpdate);
+    EXPECT_STREQ(receivedData, test_data);
 }
 
 TEST(NetworkTest, ConnectionClosure) {
-    // Test connection closure
-    EXPECT_TRUE(I_ShutdownNetwork());
+    NET_DisconnectFromServer();
+}
+
+TEST(NetworkTest, Latency) {
+    EXPECT_GE(NET_GetLatency(), 0);
+}
+
+TEST(NetworkTest, ConnectionStatus) {
+    EXPECT_TRUE(NET_IsConnected());
 }

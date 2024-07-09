@@ -56,7 +56,7 @@
     - [ ] Implement server browser functionality
 
 14. Client-Server Communication
-    - [ ] Implement efficient protocols for frequent updates (e.g., player positions)
+    - [x] Implement efficient protocols for frequent updates (e.g., player positions)
     - [ ] Add support for UDP hole punching for peer-to-peer connections
 
 15. Cross-Platform Multiplayer
@@ -66,7 +66,7 @@
 16. Network Code Refactoring
     - [x] Separate client and server logic (done in RunNetworkGame)
     - [x] Implement proper error handling (done with try-catch blocks and NetworkException)
-    - [ ] Improve code organization and modularity
+    - [x] Improve code organization and modularity
 
 17. Game State Management
     - [x] Create GameState structure (done)
@@ -165,6 +165,10 @@
 40. Game State Prediction
     - [ ] Add client-side state prediction for smoother gameplay
     - [ ] Implement server-side validation of predicted states
+
+41. Network API Refinement
+    - [x] Add NET_GetLatency function
+    - [x] Add NET_IsConnected function
 
 ## Build System Refactoring
 

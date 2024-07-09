@@ -60,6 +60,7 @@ if( WIN32 )
 		wsock32
 		winmm
 		dinput8
+		dxguid
 		ole32
 		user32
 		gdi32
@@ -71,7 +72,15 @@ if( WIN32 )
 		dbghelp
 		legacy_stdio_definitions )
 
-	if( DEM_CMAKE_COMPILER_IS_GNUCXX_COMPATIBLE )
+	if( MSVC )
+		# Add MSVC-specific settings here
+		add_definitions( -D_CRT_SECURE_NO_WARNINGS )
+		set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS" )
+		
+		# Set Windows SDK version
+		set(CMAKE_SYSTEM_VERSION 10.0.18362.0)
+		set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.18362.0)
+	elseif( DEM_CMAKE_COMPILER_IS_GNUCXX_COMPATIBLE )
 		if( DX_dxguid_LIBRARY )
 			list( APPEND PROJECT_LIBRARIES "${DX_dxguid_LIBRARY}" )
 		endif()
