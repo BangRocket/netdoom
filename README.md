@@ -18,7 +18,15 @@ Special thanks to Coraline of the EDGE team for allowing us to use her [README.m
 
 ## How to build GZDoom
 
-To build GZDoom, please see the [wiki](https://zdoom.org/wiki/) and see the "Programmer's Corner" on the bottom-right corner of the page to build for your platform.
+To build GZDoom:
+
+1. Ensure you have CMake 3.20 or later installed.
+2. Clone the repository and navigate to the project root.
+3. Create a build directory: `mkdir build && cd build`
+4. Run CMake: `cmake ..`
+5. Build the project: `cmake --build .`
+
+For platform-specific instructions and more detailed information, please see the [wiki](https://zdoom.org/wiki/) and check the "Programmer's Corner" on the bottom-right corner of the page.
 
 # Resources
 - https://zdoom.org/ - Home Page
