@@ -357,6 +357,9 @@ void PacketSend (void)
 	}
 	//	if (c == -1)
 	//			I_Error ("SendPacket error: %s",strerror(errno));
+
+	// Call the new SendNetworkMessage function
+	SendNetworkMessage(doomcom.data, doomcom.datalength);
 }
 
 
@@ -442,6 +445,15 @@ void PacketGet (void)
 
 	doomcom.remotenode = node;
 	doomcom.datalength = (short)c;
+
+	// Call the new ReceiveNetworkMessage function
+	size_t length;
+	void* receivedData = ReceiveNetworkMessage(&length);
+	if (receivedData != NULL && length > 0)
+	{
+		memcpy(doomcom.data, receivedData, length);
+		doomcom.datalength = (short)length;
+	}
 }
 
 void SendNetworkMessage(const void* data, size_t length)
