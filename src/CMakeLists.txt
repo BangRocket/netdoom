@@ -1210,6 +1210,8 @@ set( GAME_SOURCES
 )
 
 list(FILTER GAME_SOURCES EXCLUDE REGEX "common/networking/netgame.cpp")
+
+list(FILTER GAME_SOURCES EXCLUDE REGEX "common/networking/netgame.cpp")
 	common/utility/x86.cpp
 	common/thirdparty/strnatcmp.c
 	common/thirdparty/utf8proc/utf8proc.c
