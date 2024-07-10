@@ -1183,10 +1183,6 @@ set (PCH_SOURCES
 	common/scripting/backend/vmbuilder.cpp
 	common/scripting/backend/codegen.cpp
 	
-	common/networking/netgame.cpp
-	common/networking/nethost.cpp
-	common/networking/netspectator.cpp
-	
 	utility/nodebuilder/nodebuild.cpp
 	utility/nodebuilder/nodebuild_classify_nosse2.cpp
 	utility/nodebuilder/nodebuild_events.cpp
@@ -1208,10 +1204,6 @@ set( GAME_SOURCES
 	${FASTMATH_SOURCES}
 	${PCH_SOURCES}
 )
-
-list(FILTER GAME_SOURCES EXCLUDE REGEX "common/networking/netgame.cpp")
-
-list(FILTER GAME_SOURCES EXCLUDE REGEX "common/networking/netgame.cpp")
 
 list(APPEND GAME_SOURCES
 	common/utility/x86.cpp
