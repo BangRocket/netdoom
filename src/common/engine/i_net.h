@@ -80,15 +80,15 @@ extern bool isClient;
 #define MAX_CLIENTS 16
 extern int numClients;
 struct ClientInfo {
-    sockaddr_in address;
+    struct sockaddr_in address;
     int player;
 };
 extern ClientInfo clients[MAX_CLIENTS];
 
 // New functions for client management
-bool AddClient(const sockaddr_in* address);
-void RemoveClient(const sockaddr_in* address);
-int GetClientPlayer(const sockaddr_in* address);
+bool AddClient(const struct sockaddr_in* address);
+void RemoveClient(const struct sockaddr_in* address);
+int GetClientPlayer(const struct sockaddr_in* address);
 
 // Game state structures
 struct PlayerState {
