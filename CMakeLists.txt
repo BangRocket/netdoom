@@ -1,40 +1,20 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required( VERSION 3.16 )
 
-# Set policies
-cmake_policy(SET CMP0011 NEW)
-cmake_policy(SET CMP0054 NEW)
-cmake_policy(SET CMP0067 NEW)
-cmake_policy(SET CMP0091 NEW)
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
-# Use C++17
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-include(FetchContent)
-
-# Declare dependencies
-FetchContent_Declare(
-  zlib
-  GIT_REPOSITORY https://github.com/madler/zlib.git
-  GIT_TAG v1.2.11
-)
-
-FetchContent_Declare(
-  bzip2
-  GIT_REPOSITORY https://gitlab.com/bzip2/bzip2.git
-  GIT_TAG bzip2-1.0.8
-)
-
-FetchContent_Declare(
-  asmjit
-  GIT_REPOSITORY https://github.com/asmjit/asmjit.git
-  GIT_TAG master
-)
-
-# Make dependencies available
-FetchContent_MakeAvailable(zlib bzip2 asmjit)
+if( COMMAND cmake_policy )
+	if( POLICY CMP0011 )
+		cmake_policy( SET CMP0011 NEW )
+	endif()
+	if( POLICY CMP0054 )
+		cmake_policy( SET CMP0054 NEW )
+	endif()
+	if ( POLICY CMP0067 )
+		cmake_policy( SET CMP0067 NEW )
+	endif()
+	if ( POLICY CMP0091 )
+		cmake_policy( SET CMP0091 NEW )
+		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	endif()
+endif()
 
 if (LIBVPX_VCPKG)
 	list(APPEND VCPKG_MANIFEST_FEATURES "vcpkg-libvpx")
@@ -47,11 +27,6 @@ endif()
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR (NOT CMAKE_SYSTEM_NAME AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows"))
 	# Force static triplet on Windows
 	set(VCPKG_TARGET_TRIPLET "x64-windows-static")
-endif()
-
-# Set the generator platform before calling project()
-if(CMAKE_GENERATOR MATCHES "Visual Studio")
-    set(CMAKE_GENERATOR_PLATFORM x64 CACHE STRING "" FORCE)
 endif()
 
 project(GZDoom)
@@ -251,8 +226,6 @@ endif()
 
 option (HAVE_VULKAN "Enable Vulkan support" ON)
 option (HAVE_GLES2 "Enable GLES2 support" ON)
-option (ENABLE_TESTS "Enable building and running tests" ON)
-option (ENABLE_SANITIZERS "Enable Address Sanitizer and Undefined Behavior Sanitizer" OFF)
 
 # no, we're not using external asmjit for now, we made too many modifications to our's.
 # if the asmjit author uses our changes then we'll update this.
@@ -347,20 +320,17 @@ set( CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${REL_LIN
 set( CMAKE_EXE_LINKER_FLAGS_MINSIZEREL "${CMAKE_EXE_LINKER_FLAGS_MINSIZEREL} ${REL_LINKER_FLAGS}" )
 set( CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} ${REL_LINKER_FLAGS}" )
 
-# Define a function to set compiler flags
-function(set_compiler_flags target)
-    target_compile_options(${target} PRIVATE
-        $<$<CONFIG:Release>:${REL_C_FLAGS}>
-        $<$<CONFIG:MinSizeRel>:${REL_C_FLAGS}>
-        $<$<CONFIG:RelWithDebInfo>:${REL_C_FLAGS}>
-        $<$<CONFIG:Debug>:${DEB_C_FLAGS} -D_DEBUG>
-    )
-    target_compile_options(${target} PRIVATE ${ALL_C_FLAGS})
-endfunction()
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ALL_C_FLAGS}" )
+set( CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${REL_C_FLAGS}" )
+set( CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} ${REL_C_FLAGS}" )
+set( CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} ${REL_C_FLAGS}" )
+set( CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${DEB_C_FLAGS} -D_DEBUG" )
 
-# Use this function for each target in your project
-# For example:
-# set_compiler_flags(your_target_name)
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ALL_C_FLAGS}" )
+set( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${REL_C_FLAGS}" )
+set( CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} ${REL_C_FLAGS}" )
+set( CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${REL_C_FLAGS}" )
+set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${DEB_C_FLAGS} -D_DEBUG" )
 
 option(FORCE_INTERNAL_BZIP2 "Use internal bzip2")
 option(FORCE_INTERNAL_ASMJIT "Use internal asmjit" ON)
@@ -444,18 +414,6 @@ add_subdirectory( wadsrc_lights )
 add_subdirectory( wadsrc_extra )
 add_subdirectory( wadsrc_widepix )
 add_subdirectory( src )
-if(ENABLE_TESTS)
-    add_subdirectory( tests )
-endif()
-
-if(ENABLE_SANITIZERS)
-    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined -fno-omit-frame-pointer")
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address,undefined")
-    else()
-        message(WARNING "Sanitizers are only supported with GCC and Clang")
-    endif()
-endif()
 
 if( NOT CMAKE_CROSSCOMPILING )
 	export(TARGETS ${CROSS_EXPORTS} FILE "${CMAKE_BINARY_DIR}/ImportExecutables.cmake" )
