@@ -15,6 +15,9 @@ if( COMMAND cmake_policy )
 		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 	endif()
 endif()
+# Add these lines to set the policies that were causing warnings
+cmake_policy(SET CMP0159 NEW)
+cmake_policy(SET CMP0126 NEW)
 
 if (LIBVPX_VCPKG)
 	list(APPEND VCPKG_MANIFEST_FEATURES "vcpkg-libvpx")

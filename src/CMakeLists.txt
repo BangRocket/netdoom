@@ -3,7 +3,7 @@ cmake_minimum_required( VERSION 3.16.0 )
 include(precompiled_headers)
 
 if( COMMAND cmake_policy )
-	cmake_policy( SET CMP0003 NEW )
+    cmake_policy( SET CMP0003 NEW )
 endif()
 
 include( CheckCXXSourceCompiles )
@@ -15,12 +15,12 @@ include( CheckLibraryExists )
 include( FindPkgConfig )
 
 if( DEM_CMAKE_COMPILER_IS_GNUCXX_COMPATIBLE )
-	option( NO_STRIP "Do not strip Release or MinSizeRel builds" )
-	# At least some versions of Xcode fail if you strip with the linker
-	# instead of the separate strip utility.
-	if( APPLE )
-		set( NO_STRIP ON )
-	endif()
+    option( NO_STRIP "Do not strip Release or MinSizeRel builds" )
+    # At least some versions of Xcode fail if you strip with the linker
+    # instead of the separate strip utility.
+    if( APPLE )
+        set( NO_STRIP ON )
+    endif()
 endif()
 
 if( APPLE )
@@ -29,125 +29,131 @@ endif()
 
 option( ZDOOM_ENABLE_SWR "Enable software renderer" ON )
 if( NOT ZDOOM_ENABLE_SWR )
-	add_definitions( -DNO_SWRENDERER )
+    add_definitions( -DNO_SWRENDERER )
 endif()
 
 target_architecture(TARGET_ARCHITECTURE)
 message(STATUS "Architecture is ${TARGET_ARCHITECTURE}")
 
 if ( ${TARGET_ARCHITECTURE} MATCHES "arm64" )
-	set (ARM64 aarch64)
+    set (ARM64 aarch64)
 endif()
 
 # Right now only 64 bit is supported.
 if( ${TARGET_ARCHITECTURE} MATCHES "x86_64" )
-	set( X64 64 )
-	add_definitions( -DARCH_IA32 )
+    set( X64 64 )
+    add_definitions( -DARCH_IA32 )
 endif()
 
 if( NOT PROJECT_LIBRARIES )
-	set( PROJECT_LIBRARIES "" )
+    set( PROJECT_LIBRARIES "" )
 endif()
 
 add_definitions( -DTHIS_IS_GZDOOM )
 
 if( WIN32 )
+    add_definitions( -D_WIN32 )
+    set( PROJECT_LIBRARIES
+        psapi
+        wsock32
+        winmm
+        dinput8
+        dxguid
+        ole32
+        user32
+        gdi32
+        comctl32
+        comdlg32
+        ws2_32
+        setupapi
+        oleaut32
+        dbghelp
+        legacy_stdio_definitions )
 
-	add_definitions( -D_WIN32 )
-
-	set( PROJECT_LIBRARIES
-		psapi
-		wsock32
-		winmm
-		dinput8
-		dxguid
-		ole32
-		user32
-		gdi32
-		comctl32
-		comdlg32
-		ws2_32
-		setupapi
-		oleaut32
-		dbghelp
-		legacy_stdio_definitions )
-
-	if( MSVC )
-		# Add MSVC-specific settings here
-		add_definitions( -D_CRT_SECURE_NO_WARNINGS )
-		set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS" )
-		
-		# Set Windows SDK version (only for MSVC, not for MinGW)
-		if(NOT MINGW)
-			set(CMAKE_SYSTEM_VERSION 10.0.18362.0)
-			set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.18362.0)
-		endif()
-	elseif( DEM_CMAKE_COMPILER_IS_GNUCXX_COMPATIBLE )
-		if( DX_dxguid_LIBRARY )
-			list( APPEND PROJECT_LIBRARIES "${DX_dxguid_LIBRARY}" )
-		endif()
-	endif()
+    if( MSVC )
+        # Add MSVC-specific settings here
+        add_definitions( -D_CRT_SECURE_NO_WARNINGS )
+        set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS" )
+        
+        # Set Windows SDK version (only for MSVC, not for MinGW)
+        if(NOT MINGW)
+            set(CMAKE_SYSTEM_VERSION 10.0.18362.0)
+            set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.18362.0)
+        endif()
+    elseif( DEM_CMAKE_COMPILER_IS_GNUCXX_COMPATIBLE )
+        if( DX_dxguid_LIBRARY )
+            list( APPEND PROJECT_LIBRARIES "${DX_dxguid_LIBRARY}" )
+        endif()
+    endif()
 else()
-	if( APPLE )
-		set( NO_GTK ON )
-		set( DYN_GTK OFF )
+    if( APPLE )
+        set( NO_GTK ON )
+        set( DYN_GTK OFF )
 
-		# Prevent inclusion of fp.h and FixMath.h from Carbon framework
-		# Declarations from these files are not used but cause the following conflicts:
-		#  - redefinition of 'FixedToFloat' and 'FloatToFixed' macros
-		#  - redefinition of 'pi' as different kind of symbol
-		add_definitions( -D__FP__ -D__FIXMATH__ )
-	else()
-		option( NO_GTK "Disable GTK+ dialogs (Not applicable to Windows)" )
-		option( DYN_GTK "Load GTK+ at runtime instead of compile time" ON )
+        # Prevent inclusion of fp.h and FixMath.h from Carbon framework
+        # Declarations from these files are not used but cause the following conflicts:
+        #  - redefinition of 'FixedToFloat' and 'FloatToFixed' macros
+        #  - redefinition of 'pi' as different kind of symbol
+        add_definitions( -D__FP__ -D__FIXMATH__ )
+    else()
+        option( NO_GTK "Disable GTK+ dialogs (Not applicable to Windows)" )
+        option( DYN_GTK "Load GTK+ at runtime instead of compile time" ON )
 
-		# Use GTK+ for the IWAD picker, if available.
-		if( NOT NO_GTK )
-			pkg_check_modules( GTK3 gtk+-3.0 )
-			if( GTK3_FOUND )
-				if( NOT DYN_GTK )
-					set( PROJECT_LIBRARIES ${PROJECT_LIBRARIES} ${GTK3_LIBRARIES} )
-				endif()
-				include_directories( SYSTEM ${GTK3_INCLUDE_DIRS} )
-				link_directories( ${GTK3_LIBRARY_DIRS} )
-			else()
-				pkg_check_modules( GTK2 gtk+-2.0 )
-				if( GTK2_FOUND )
-					if( NOT DYN_GTK )
-						set( PROJECT_LIBRARIES ${PROJECT_LIBRARIES} ${GTK2_LIBRARIES} )
-					endif()
-					include_directories( SYSTEM ${GTK2_INCLUDE_DIRS} )
-					link_directories( ${GTK2_LIBRARY_DIRS} )
-				else()
-					set( NO_GTK ON )
-				endif()
-			endif()
-		endif()
-	endif()
+        # Use GTK+ for the IWAD picker, if available.
+        if( NOT NO_GTK )
+            pkg_check_modules( GTK3 gtk+-3.0 )
+            if( GTK3_FOUND )
+                if( NOT DYN_GTK )
+                    set( PROJECT_LIBRARIES ${PROJECT_LIBRARIES} ${GTK3_LIBRARIES} )
+                endif()
+                include_directories( SYSTEM ${GTK3_INCLUDE_DIRS} )
+                link_directories( ${GTK3_LIBRARY_DIRS} )
+            else()
+                pkg_check_modules( GTK2 gtk+-2.0 )
+                if( GTK2_FOUND )
+                    if( NOT DYN_GTK )
+                        set( PROJECT_LIBRARIES ${PROJECT_LIBRARIES} ${GTK2_LIBRARIES} )
+                    endif()
+                    include_directories( SYSTEM ${GTK2_INCLUDE_DIRS} )
+                    link_directories( ${GTK2_LIBRARY_DIRS} )
+                else()
+                    set( NO_GTK ON )
+                endif()
+            endif()
+        endif()
+    endif()
 
-	if ( NOT WIN32 )
-		option( NO_SDL_JOYSTICK "Disable SDL joystick support (Not applicable to Windows)" OFF )
-		if ( NO_SDL_JOYSTICK )
-			add_definitions( -DNO_SDL_JOYSTICK=1 )
-		endif()
-	endif()
+    if ( NOT WIN32 )
+        option( NO_SDL_JOYSTICK "Disable SDL joystick support (Not applicable to Windows)" OFF )
+        if ( NO_SDL_JOYSTICK )
+            add_definitions( -DNO_SDL_JOYSTICK=1 )
+        endif()
+    endif()
 
-	if( NO_GTK )
-		add_definitions( -DNO_GTK )
-	elseif( DYN_GTK )
-		add_definitions( -DDYN_GTK=1 )
-	else()
-		add_definitions( -DDYN_GTK=0 )
-	endif()
+    if( NO_GTK )
+        add_definitions( -DNO_GTK )
+    elseif( DYN_GTK )
+        add_definitions( -DDYN_GTK=1 )
+    else()
+        add_definitions( -DDYN_GTK=0 )
+    endif()
 
-	# Non-Windows version also needs SDL except native OS X backend
-	if( NOT APPLE OR NOT OSX_COCOA_BACKEND )
-		find_package( SDL2 REQUIRED )
-		include_directories( SYSTEM "${SDL2_INCLUDE_DIR}" )
-		set( PROJECT_LIBRARIES ${PROJECT_LIBRARIES} "${SDL2_LIBRARY}" )
-	endif()
+    # Non-Windows version also needs SDL except native OS X backend
+    if( NOT APPLE OR NOT OSX_COCOA_BACKEND )
+        find_package( SDL2 REQUIRED )
+        include_directories( SYSTEM "${SDL2_INCLUDE_DIR}" )
+        set( PROJECT_LIBRARIES ${PROJECT_LIBRARIES} "${SDL2_LIBRARY}" )
+    endif()
 
 endif()
+
+# Set C++14 for main GZDoom source
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF) 
+
+# Set C++17 for libraries
+set(LIBRARY_CXX_STANDARD 17)
 
 if( NOT NO_OPENAL )
 	if ( "vcpkg-openal-soft" IN_LIST VCPKG_MANIFEST_FEATURES )
@@ -1258,6 +1264,19 @@ set( GAME_NONPCH_SOURCES ${GAME_SOURCES} )
 list( REMOVE_ITEM GAME_NONPCH_SOURCES ${PCH_SOURCES} )
 
 add_executable( zdoom WIN32 MACOSX_BUNDLE ${GAME_SOURCES} )
+set_target_properties(zdoom PROPERTIES CXX_STANDARD 14)
+
+# For each library that needs C++17, add:
+if (HAVE_VULKAN)
+    list( APPEND PROJECT_LIBRARIES "zvulkan" )
+    set_target_properties(zvulkan PROPERTIES CXX_STANDARD ${LIBRARY_CXX_STANDARD})
+endif()
+
+list( APPEND PROJECT_LIBRARIES "zwidget" )
+set_target_properties(zwidget PROPERTIES CXX_STANDARD ${LIBRARY_CXX_STANDARD})
+
+list( APPEND PROJECT_LIBRARIES "webp" )
+set_target_properties(webp PROPERTIES CXX_STANDARD ${LIBRARY_CXX_STANDARD})
 
 target_precompile_headers( zdoom PRIVATE g_pch.h )
 
