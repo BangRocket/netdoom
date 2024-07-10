@@ -18,12 +18,14 @@ add_executable(unit_tests
   network_tests.cpp
 )
 
-# Link test executable against gtest & your library
+# Link test executable against gtest
 target_link_libraries(unit_tests
   gtest
   gtest_main
-  zdoom  # Assuming 'zdoom' is the name of your main library
 )
+
+# Add dependency on zdoom
+add_dependencies(unit_tests zdoom)
 
 # Add tests to be run
 add_test(NAME unit_tests COMMAND unit_tests)
