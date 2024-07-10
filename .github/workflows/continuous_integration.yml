@@ -12,14 +12,17 @@ jobs:
         config:
         - name: Visual Studio 2022
           os: windows-2022
+          extra_options: -DCMAKE_TOOLCHAIN_FILE=build/vcpkg/scripts/buildsystems/vcpkg.cmake
           build_type: Release
 
         - name: Visual Studio 2022
           os: windows-2022
+          extra_options: -DCMAKE_TOOLCHAIN_FILE=build/vcpkg/scripts/buildsystems/vcpkg.cmake
           build_type: Debug
 
         - name: Visual Studio 2019
           os: windows-2019
+          extra_options: -DCMAKE_TOOLCHAIN_FILE=build/vcpkg/scripts/buildsystems/vcpkg.cmake
           build_type: Release
 
         # - name: macOS
@@ -80,33 +83,15 @@ jobs:
     
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v11
+      if: runner.os == 'Windows'
       with:
         vcpkgDirectory: '${{ github.workspace }}/build/vcpkg'
         vcpkgGitCommitId: '2c401863dd54a640aeb26ed736c55489c079323b'
 
-    - name: Verify vcpkg
-      shell: bash
-      run: |
-        if [[ "${{ runner.os }}" == "Windows" ]]; then
-          dir "${{ github.workspace }}\build\vcpkg"
-          dir "${{ github.workspace }}\build\vcpkg\scripts\buildsystems"
-        else
-          ls "${{ github.workspace }}/build/vcpkg"
-          ls "${{ github.workspace }}/build/vcpkg/scripts/buildsystems"
-        fi
-
     - name: Configure
       shell: bash
       run: |
-        VCPKG_TOOLCHAIN_PATH="${{ github.workspace }}/build/vcpkg/scripts/buildsystems/vcpkg.cmake"
-        cmake -B build \
-          -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} \
-          -DCMAKE_PREFIX_PATH=$(pwd)/build/zmusic \
-          -DPK3_QUIET_ZIPDIR=ON \
-          -DCMAKE_TOOLCHAIN_FILE="$VCPKG_TOOLCHAIN_PATH" \
-          ${{ matrix.config.extra_options }} \
-          . \
-          --debug-output
+        cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} -DCMAKE_PREFIX_PATH=`pwd`/build/zmusic -DPK3_QUIET_ZIPDIR=ON ${{ matrix.config.extra_options }} .
 
     - name: Build
       shell: bash

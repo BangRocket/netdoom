@@ -1,66 +1,52 @@
 cmake_minimum_required( VERSION 3.16 )
 
 if( COMMAND cmake_policy )
-    if( POLICY CMP0011 )
-        cmake_policy( SET CMP0011 NEW )
-    endif()
-    if( POLICY CMP0054 )
-        cmake_policy( SET CMP0054 NEW )
-    endif()
-    if ( POLICY CMP0067 )
-        cmake_policy( SET CMP0067 NEW )
-    endif()
-    if ( POLICY CMP0091 )
-        cmake_policy( SET CMP0091 NEW )
-        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    endif()
+	if( POLICY CMP0011 )
+		cmake_policy( SET CMP0011 NEW )
+	endif()
+	if( POLICY CMP0054 )
+		cmake_policy( SET CMP0054 NEW )
+	endif()
+	if ( POLICY CMP0067 )
+		cmake_policy( SET CMP0067 NEW )
+	endif()
+	if ( POLICY CMP0091 )
+		cmake_policy( SET CMP0091 NEW )
+		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	endif()
 endif()
-# Add these lines to set the policies that were causing warnings
-cmake_policy(SET CMP0159 NEW)
-cmake_policy(SET CMP0126 NEW)
-
-# Add these lines to set the policies that were causing warnings
-cmake_policy(SET CMP0159 NEW)
-cmake_policy(SET CMP0126 NEW)
 
 if (LIBVPX_VCPKG)
-    list(APPEND VCPKG_MANIFEST_FEATURES "vcpkg-libvpx")
+	list(APPEND VCPKG_MANIFEST_FEATURES "vcpkg-libvpx")
 endif()
 
 if (OPENAL_SOFT_VCPKG)
-    list(APPEND VCPKG_MANIFEST_FEATURES "vcpkg-openal-soft")
+	list(APPEND VCPKG_MANIFEST_FEATURES "vcpkg-openal-soft")
 endif()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR (NOT CMAKE_SYSTEM_NAME AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows"))
-    # Force static triplet on Windows
-    set(VCPKG_TARGET_TRIPLET "x64-windows-static")
+	# Force static triplet on Windows
+	set(VCPKG_TARGET_TRIPLET "x64-windows-static")
 endif()
 
 project(GZDoom)
 
 if (WIN32 AND VCPKG_TOOLCHAIN)
-    option(LIBVPX_VCPKG "Use libvpx from vcpkg" OFF)
+	option(LIBVPX_VCPKG "Use libvpx from vcpkg" OFF)
 endif()
 
 if (VCPKG_TOOLCHAIN)
-    option(OPENAL_SOFT_VCPKG "Use OpenAL from vcpkg" OFF)
+	option(OPENAL_SOFT_VCPKG "Use OpenAL from vcpkg" OFF)
 endif()
 
 if (NOT VCPKG_TOOLCHAIN)
-    set(VCPKG_MANIFEST_FEATURES)
+	set(VCPKG_MANIFEST_FEATURES)
 endif()
 
-# Change these lines to use C++14
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF) 
 
-# Add these lines to enforce C++14 for specific compilers
-if(MSVC)
-    add_compile_options(/std:c++14)
-elseif(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    add_compile_options(-std=c++14)
-endif()
 
 list( APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 include( FindPackageHandleStandardArgs )
