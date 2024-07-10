@@ -2,6 +2,10 @@
 #define __I_NET_H__
 
 #include <stdint.h>
+#include <map>
+#include <arpa/inet.h>
+
+#define MAXPLAYERS 8  // Adjust this value as needed
 
 // Called by D_DoomMain.
 int I_InitNetwork (void);
@@ -51,6 +55,7 @@ extern bool isServer;
 extern bool isClient;
 
 // Add these declarations
+struct ticcmd_t;  // Forward declaration
 void StoreCommand(int inputSequence, const ticcmd_t& cmd);
 ticcmd_t GetStoredCommand(int inputSequence);
 extern std::map<int, ticcmd_t> storedCommands;
@@ -80,7 +85,7 @@ extern bool isClient;
 #define MAX_CLIENTS 16
 extern int numClients;
 struct ClientInfo {
-    struct sockaddr_in address;
+    sockaddr_in address;
     int player;
 };
 extern ClientInfo clients[MAX_CLIENTS];
@@ -90,18 +95,6 @@ bool AddClient(const struct sockaddr_in* address);
 void RemoveClient(const struct sockaddr_in* address);
 int GetClientPlayer(const struct sockaddr_in* address);
 
-// Game state structures
-struct PlayerState {
-    double x, y, z;
-    double angle;
-    int health;
-};
-
-struct GameState {
-    int gametic;
-    int consoleplayer;
-    PlayerState playerStates[MAXPLAYERS];
-};
 
 enum ENetConstants
 {
