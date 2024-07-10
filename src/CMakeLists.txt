@@ -1212,6 +1212,8 @@ set( GAME_SOURCES
 list(FILTER GAME_SOURCES EXCLUDE REGEX "common/networking/netgame.cpp")
 
 list(FILTER GAME_SOURCES EXCLUDE REGEX "common/networking/netgame.cpp")
+
+list(APPEND GAME_SOURCES
 	common/utility/x86.cpp
 	common/thirdparty/strnatcmp.c
 	common/thirdparty/utf8proc/utf8proc.c
@@ -1258,7 +1260,6 @@ list(FILTER GAME_SOURCES EXCLUDE REGEX "common/networking/netgame.cpp")
 	common/filesystem/source/fs_stringpool.cpp
 	common/filesystem/source/unicode.cpp
 	common/filesystem/source/critsec.cpp
-
 )
 
 set( GAME_NONPCH_SOURCES ${GAME_SOURCES} )
